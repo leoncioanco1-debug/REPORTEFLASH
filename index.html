@@ -188,7 +188,7 @@
 
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
-                        <i class="fa-solid fn-comment-medical text-amber-400 mr-1"></i> Descripción o Detalles (Opcional)
+                        <i class="fa-solid fa-comment-medical text-amber-400 mr-1"></i> Descripción o Detalles (Opcional)
                     </label>
                     <textarea id="hazardDesc" rows="2" placeholder="Ej: Cables expuestos sin cinta aislante cerca de la zona de tránsito."
                         class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-amber-500 text-sm resize-none"></textarea>
@@ -241,13 +241,20 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'reporte-flash-mining';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        const firebaseConfig = {
+            apiKey: "AIzaSyAQDfMVfnVsR5LCR-PkRPE0QWe2dMQ8gHc",
+            authDomain: "reporte-fla.firebaseapp.com",
+            projectId: "reporte-fla",
+            storageBucket: "reporte-fla.firebasestorage.app",
+            messagingSenderId: "673783183660",
+            appId: "1:673783183660:web:ff5f0ab192d5a92a64d489",
+            measurementId: "G-6MQPMYNCP1"
+        };
 
+        const appId = 'reporte-flash-mining';
         let db, auth, currentUser = null;
         let reportsCache = [];
 
@@ -257,18 +264,17 @@
                 db = getFirestore(app);
                 auth = getAuth(app);
 
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
+                try {
                     await signInAnonymously(auth);
+                    currentUser = auth.currentUser;
+                } catch (authErr) {
+                    console.warn("Auth anónimo no habilitado en Firebase, continuando sin sesión:", authErr.message);
                 }
-                currentUser = auth.currentUser;
 
-                // Start listening to public reports collection
                 initCloudSync();
             } catch (err) {
                 console.error("Firebase init error:", err);
-                document.getElementById('cloudFeedList').innerHTML = `<p class="text-red-400 text-xs text-center py-4">Error conectando a la nube. Modo local activo.</p>`;
+                document.getElementById('cloudFeedList').innerHTML = `<p class="text-red-400 text-xs text-center py-4">Error conectando a la nube: ${err.message}</p>`;
             }
         });
 
@@ -282,12 +288,15 @@
                     reportsCache.push({ id: docSnap.id, ...docSnap.data() });
                 });
 
-                // Sort newest first in memory
                 reportsCache.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-
                 renderFeed(reportsCache);
             }, (error) => {
                 console.error("Snapshot error:", error);
+                document.getElementById('cloudFeedList').innerHTML = `
+                    <div class="text-red-400 text-xs text-center py-4 px-2">
+                        <p class="font-bold">Falta activar Firestore Database en Firebase</p>
+                        <p class="text-[10px] text-zinc-400 mt-1">Ve a Firebase Console > Firestore Database > Crear base de datos (en Modo de Prueba).</p>
+                    </div>`;
             });
         }
 
@@ -301,7 +310,6 @@
 
             const dateStr = new Date().toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' });
             
-            // Save to Firestore cloud if connected
             if (db) {
                 try {
                     const reportsCol = collection(db, 'artifacts', appId, 'public', 'data', 'reports');
@@ -312,14 +320,13 @@
                         timeStr: dateStr,
                         timestamp: Date.now(),
                         status: 'Pendiente',
-                        author: currentUser ? currentUser.uid.substring(0, 6) : 'Anónimo'
+                        author: currentUser ? currentUser.uid.substring(0, 6) : 'Equipo'
                     });
                 } catch (e) {
                     console.error("Error saving to cloud:", e);
                 }
             }
 
-            // Construct WhatsApp message
             const supervisorNumber = "51906109349";
             let message = `🚨 *REPORTE FLASH - CONDICIÓN INSEGURA* 🚨\n\n`;
             message += `⚠️ *Tipo:* ${hazardType}\n`;
@@ -446,17 +453,11 @@
 
         window.copyShareUrl = function() {
             const url = window.location.href;
-            const textarea = document.createElement('textarea');
-            textarea.value = url;
-            document.body.appendChild(textarea);
-            textarea.select();
-            try {
-                document.execCommand('copy');
+            navigator.clipboard.writeText(url).then(() => {
                 alertBoxCustom("¡Enlace copiado al portapapeles!");
-            } catch (err) {
+            }).catch(err => {
                 console.error('Failed to copy', err);
-            }
-            document.body.removeChild(textarea);
+            });
             closeShareModal();
         };
 
@@ -467,27 +468,6 @@
             document.body.appendChild(div);
             setTimeout(() => div.remove(), 2500);
         }
-        // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyAQDfMVfnVsR5LCR-PkRPE0QWe2dMQ8gHc",
-  authDomain: "reporte-fla.firebaseapp.com",
-  projectId: "reporte-fla",
-  storageBucket: "reporte-fla.firebasestorage.app",
-  messagingSenderId: "673783183660",
-  appId: "1:673783183660:web:ff5f0ab192d5a92a64d489",
-  measurementId: "G-6MQPMYNCP1"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
     </script>
 </body>
 </html>
