@@ -522,14 +522,30 @@
             });
         }
 
-        window.submitRating = function() {
+        window.submitRating = async function() {
             if (selectedRating === 0) {
                 alertBoxCustom("Por favor selecciona al menos un casquito.");
                 return;
             }
+
+            if (db) {
+                try {
+                    const ratingsCol = collection(db, 'artifacts', appId, 'public', 'data', 'ratings');
+                    await addDoc(ratingsCol, {
+                        rating: selectedRating,
+                        timestamp: Date.now(),
+                        timeStr: new Date().toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' }),
+                        author: currentUser ? currentUser.uid.substring(0, 6) : 'Anónimo'
+                    });
+                } catch (e) {
+                    console.error("Error saving rating to cloud:", e);
+                }
+            }
+
             alertBoxCustom(`¡Gracias por calificarnos con ${selectedRating} casquitos!`);
             closeRateModal();
-            // Resetear
+            
+            // Resetear calificación
             selectedRating = 0;
             document.querySelectorAll('#hatRatingContainer i').forEach(h => {
                 h.classList.remove('text-amber-400');
