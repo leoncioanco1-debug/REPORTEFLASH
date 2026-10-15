@@ -144,6 +144,14 @@
 
     </main>
 
+    <!-- Botón flotante de Califícanos -->
+    <div class="fixed bottom-4 left-4 z-40">
+        <button onclick="openRateModal()" class="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold px-4 py-2.5 rounded-2xl shadow-xl flex items-center gap-2 text-xs uppercase tracking-wider transition-all transform hover:scale-105 border border-amber-300">
+            <i class="fa-solid fa-hard-hat text-base"></i>
+            <span>Califícanos</span>
+        </button>
+    </div>
+
     <footer class="bg-zinc-900 border-t border-zinc-800 py-5 px-4 mt-auto">
         <div class="max-w-md mx-auto text-center">
             <a href="https://wa.me/51906109349?text=Hola%20Supervisor,%20necesito%20reportar%20una%20emergencia%20o%20condición%20insegura." target="_blank"
@@ -157,6 +165,7 @@
         </div>
     </footer>
 
+    <!-- Modal de Reporte -->
     <div id="reportModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden transition-opacity opacity-0">
         <div class="bg-zinc-900 border border-zinc-800 w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl transform translate-y-full sm:translate-y-0 transition-transform duration-300" id="modalContent">
             
@@ -216,6 +225,7 @@
         </div>
     </div>
 
+    <!-- Modal de Compartir App -->
     <div id="shareModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-zinc-900 border border-zinc-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center">
             <div class="w-14 h-14 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center text-amber-400 text-2xl mx-auto mb-3">
@@ -233,6 +243,35 @@
                     <i class="fa-solid fa-copy"></i> Copiar Enlace
                 </button>
                 <button onclick="closeShareModal()" class="px-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold py-3 rounded-xl text-xs transition-colors">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Califícanos -->
+    <div id="rateModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity opacity-0">
+        <div class="bg-zinc-900 border border-zinc-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center transform scale-95 transition-transform duration-300" id="rateModalContent">
+            <div class="w-14 h-14 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center text-amber-400 text-2xl mx-auto mb-3">
+                <i class="fa-solid fa-hard-hat"></i>
+            </div>
+            <h3 class="text-lg font-black text-white mb-1">Califícanos</h3>
+            <p class="text-xs text-zinc-400 mb-4">¿Qué tan útil y efectiva ha sido esta herramienta para sus operaciones?</p>
+            
+            <!-- Selector de Casquitos -->
+            <div id="hatRatingContainer" class="flex justify-center gap-3 mb-6 text-3xl cursor-pointer text-zinc-600">
+                <i class="fa-solid fa-hard-hat transition-colors hover:text-amber-400" data-value="1"></i>
+                <i class="fa-solid fa-hard-hat transition-colors hover:text-amber-400" data-value="2"></i>
+                <i class="fa-solid fa-hard-hat transition-colors hover:text-amber-400" data-value="3"></i>
+                <i class="fa-solid fa-hard-hat transition-colors hover:text-amber-400" data-value="4"></i>
+                <i class="fa-solid fa-hard-hat transition-colors hover:text-amber-400" data-value="5"></i>
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="submitRating()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold py-3 rounded-xl text-xs transition-colors shadow-lg shadow-amber-500/20">
+                    Enviar Calificación
+                </button>
+                <button onclick="closeRateModal()" class="px-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold py-3 rounded-xl text-xs transition-colors">
                     Cerrar
                 </button>
             </div>
@@ -257,6 +296,7 @@
         const appId = 'reporte-flash-mining';
         let db, auth, currentUser = null;
         let reportsCache = [];
+        let selectedRating = 0;
 
         window.addEventListener('DOMContentLoaded', async () => {
             try {
@@ -272,6 +312,7 @@
                 }
 
                 initCloudSync();
+                setupRatingSystem();
             } catch (err) {
                 console.error("Firebase init error:", err);
                 document.getElementById('cloudFeedList').innerHTML = `<p class="text-red-400 text-xs text-center py-4">Error conectando a la nube: ${err.message}</p>`;
@@ -340,10 +381,7 @@
             const encodedMessage = encodeURIComponent(message);
             const whatsappUrl = `https://wa.me/${supervisorNumber}?text=${encodedMessage}`;
 
-            // Cierra el modal de inmediato
             closeReportModal();
-
-            // Redirige a WhatsApp en la misma pestaña para evitar bloqueos del navegador
             window.location.href = whatsappUrl;
         };
 
@@ -441,6 +479,62 @@
             setTimeout(() => {
                 modal.classList.add('hidden');
             }, 300);
+        };
+
+        // Lógica del Modal de Califícanos
+        window.openRateModal = function() {
+            const modal = document.getElementById('rateModal');
+            const content = document.getElementById('rateModalContent');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        };
+
+        window.closeRateModal = function() {
+            const modal = document.getElementById('rateModal');
+            const content = document.getElementById('rateModalContent');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        };
+
+        function setupRatingSystem() {
+            const hats = document.querySelectorAll('#hatRatingContainer i');
+            hats.forEach(hat => {
+                hat.addEventListener('click', () => {
+                    selectedRating = parseInt(hat.getAttribute('data-value'));
+                    hats.forEach((h, index) => {
+                        if (index < selectedRating) {
+                            h.classList.remove('text-zinc-600');
+                            h.classList.add('text-amber-400');
+                        } else {
+                            h.classList.remove('text-amber-400');
+                            h.classList.add('text-zinc-600');
+                        }
+                    });
+                });
+            });
+        }
+
+        window.submitRating = function() {
+            if (selectedRating === 0) {
+                alertBoxCustom("Por favor selecciona al menos un casquito.");
+                return;
+            }
+            alertBoxCustom(`¡Gracias por calificarnos con ${selectedRating} casquitos!`);
+            closeRateModal();
+            // Resetear
+            selectedRating = 0;
+            document.querySelectorAll('#hatRatingContainer i').forEach(h => {
+                h.classList.remove('text-amber-400');
+                h.classList.add('text-zinc-600');
+            });
         };
 
         window.shareAppURL = function() {
