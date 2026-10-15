@@ -467,6 +467,27 @@
             document.body.appendChild(div);
             setTimeout(() => div.remove(), 2500);
         }
+        // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAQDfMVfnVsR5LCR-PkRPE0QWe2dMQ8gHc",
+  authDomain: "reporte-fla.firebaseapp.com",
+  projectId: "reporte-fla",
+  storageBucket: "reporte-fla.firebasestorage.app",
+  messagingSenderId: "673783183660",
+  appId: "1:673783183660:web:ff5f0ab192d5a92a64d489",
+  measurementId: "G-6MQPMYNCP1"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
     </script>
 </body>
 </html>
