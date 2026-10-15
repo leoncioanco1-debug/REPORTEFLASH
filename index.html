@@ -340,14 +340,11 @@
             const encodedMessage = encodeURIComponent(message);
             const whatsappUrl = `https://wa.me/${supervisorNumber}?text=${encodedMessage}`;
 
-            // 1. Cierra el modal de inmediato
+            // Cierra el modal de inmediato
             closeReportModal();
 
-            // 2. Abre WhatsApp en una nueva pestaña
-            window.open(whatsappUrl, '_blank');
-
-            // 3. Cambia automáticamente a la pestaña del panel en vivo
-            switchTab('feed');
+            // Redirige a WhatsApp en la misma pestaña para evitar bloqueos del navegador
+            window.location.href = whatsappUrl;
         };
 
         function renderFeed(reports) {
@@ -449,7 +446,6 @@
         window.shareAppURL = function() {
             const modal = document.getElementById('shareModal');
             document.getElementById('shareUrlText').textContent = window.location.href;
-            modal.classList.add('hidden'); // Ajuste visual rápido
             modal.classList.remove('hidden');
         };
 
