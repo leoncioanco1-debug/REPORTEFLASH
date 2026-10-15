@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte Flash - Condiciones Inseguras</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .caution-stripes {
+            background: repeating-linear-gradient(
+                45deg,
+                #facc15,
+                #facc15 15px,
+                #18181b 15px,
+                #18181b 30px
+            );
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-full flex flex-col selection:bg-amber-500 selection:text-black">
+
+    <header class="relative bg-zinc-900 border-b border-zinc-800 shadow-xl overflow-hidden">
+        <div class="h-2 caution-stripes w-full"></div>
+        
+        <div class="max-w-md mx-auto px-4 py-6 text-center relative z-10">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/10 border-2 border-amber-500/30 text-amber-400 mb-3 shadow-lg shadow-amber-500/10">
+                <i class="fa-solid fa-hard-hat text-3xl"></i>
+            </div>
+            
+            <h1 class="text-3xl font-black tracking-tight text-white uppercase font-sans drop-shadow-md">
+                REPORTE <span class="text-amber-400">FLASH</span>
+            </h1>
+            <div class="mt-2 inline-flex items-center gap-2 bg-zinc-800/80 border border-zinc-700/60 px-4 py-1.5 rounded-full text-sm font-semibold text-amber-300">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Modo Nube Activo</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-md w-full mx-auto px-4 pt-4">
+        <div class="grid grid-cols-2 gap-2 bg-zinc-900 p-1.5 rounded-2xl border border-zinc-800">
+            <button onclick="switchTab('report')" id="tabReport" class="py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-amber-500 text-zinc-950 transition-all flex items-center justify-center gap-2 shadow">
+                <i class="fa-solid fa-triangle-exclamation"></i> Reportar
+            </button>
+            <button onclick="switchTab('feed')" id="tabFeed" class="py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-zinc-400 hover:text-white transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-tower-broadcast text-emerald-400"></i> Panel en Vivo (<span id="badgeCount">0</span>)
+            </button>
+        </div>
+    </div>
+
+    <main class="flex-1 max-w-md w-full mx-auto px-4 py-4 flex flex-col gap-4">
+        
+        <div id="sectionReport" class="flex flex-col gap-4">
+            <p class="text-xs text-center text-zinc-400 font-medium uppercase tracking-wider mb-1">
+                Selecciona la condición insegura detectada
+            </p>
+
+            <!-- Button 1: Cable Pelado -->
+            <button onclick="openReportModal('Cable Pelado', 'bg-orange-600', 'fa-plug-circle-exclamation')" 
+                class="group relative w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold py-5 px-6 rounded-2xl shadow-xl transition-all duration-200 transform active:scale-95 flex items-center justify-between border-2 border-orange-400/50">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-black/20 flex items-center justify-center text-2xl text-white group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-plug-circle-exclamation"></i>
+                    </div>
+                    <div class="text-left">
+                        <span class="block text-xs uppercase tracking-wider text-orange-200 font-semibold">Eléctrico</span>
+                        <span class="text-lg md:text-xl font-black tracking-wide underline decoration-white/40 group-hover:decoration-white">CABLE PELADO</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right text-orange-200 group-hover:translate-x-1 transition-transform"></i>
+            </button>
+
+            <!-- Button 2: Fuga de Aceite / Agua -->
+            <button onclick="openReportModal('Fuga de Aceite / Agua', 'bg-amber-500', 'fa-droplet')" 
+                class="group relative w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-zinc-950 font-black py-5 px-6 rounded-2xl shadow-xl transition-all duration-200 transform active:scale-95 flex items-center justify-between border-2 border-yellow-300/60">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-black/10 flex items-center justify-center text-2xl text-zinc-950 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-droplet"></i>
+                    </div>
+                    <div class="text-left">
+                        <span class="block text-xs uppercase tracking-wider text-zinc-800 font-bold">Ambiental / Mecánico</span>
+                        <span class="text-lg md:text-xl font-black tracking-wide underline decoration-zinc-900/40 group-hover:decoration-zinc-900">FUGA DE ACEITE / AGUA</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right text-zinc-900 group-hover:translate-x-1 transition-transform"></i>
+            </button>
+
+            <!-- Button 3: Roca Suelta / Desprendimiento -->
+            <button onclick="openReportModal('Roca Suelta / Desprendimiento', 'bg-red-600', 'fa-mountain')" 
+                class="group relative w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-5 px-6 rounded-2xl shadow-xl transition-all duration-200 transform active:scale-95 flex items-center justify-between border-2 border-red-400/50">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-black/20 flex items-center justify-center text-2xl text-white group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <div class="text-left">
+                        <span class="block text-xs uppercase tracking-wider text-red-200 font-semibold">Geotécnico / Mina</span>
+                        <span class="text-lg md:text-xl font-black tracking-wide underline decoration-white/40 group-hover:decoration-white">ROCA SUELTA / DESPRENDIMIENTO</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right text-red-200 group-hover:translate-x-1 transition-transform"></i>
+            </button>
+
+            <!-- Additional Custom Hazard Button -->
+            <button onclick="openReportModal('Otra Condición Insegura', 'bg-zinc-700', 'fa-circle-exclamation')" 
+                class="w-full bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-semibold py-3.5 px-6 rounded-xl border border-zinc-800 transition-all flex items-center justify-center gap-3 text-sm">
+                <i class="fa-solid fa-plus-circle text-amber-400"></i>
+                <span>Reportar otra condición insegura...</span>
+            </button>
+
+            <div class="mt-2 bg-zinc-900/90 border border-zinc-800/80 rounded-2xl p-4 flex items-center gap-4 shadow-lg">
+                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-2xl animate-bounce">
+                    <i class="fa-solid fa-hand-pointer"></i>
+                </div>
+                <div class="text-xs text-zinc-300 leading-relaxed">
+                    <strong class="text-white block mb-0.5">Funcionamiento rápido:</strong>
+                    Toca el botón &rarr; se guarda en la nube y abre WhatsApp &rarr; adjunta la foto y envía.
+                </div>
+                <div class="flex-shrink-0 text-emerald-400 text-2xl">
+                    <i class="fa-brands fa-whatsapp"></i>
+                </div>
+            </div>
+        </div>
+
+        <div id="sectionFeed" class="hidden flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
+                    <i class="fa-solid fa-satellite-dish text-emerald-400 animate-pulse"></i> Reportes del Equipo en Tiempo Real
+                </span>
+                <button onclick="shareAppURL()" class="text-xs bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition-colors">
+                    <i class="fa-solid fa-share-nodes"></i> Compartir App
+                </button>
+            </div>
+            
+            <div id="cloudFeedList" class="space-y-2.5 max-h-[450px] overflow-y-auto pr-1">
+                <div class="text-center py-10 text-zinc-500 text-xs italic">
+                    <i class="fa-solid fa-spinner fa-spin text-amber-400 text-lg mb-2"></i>
+                    <p>Conectando con la nube de reportes...</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-zinc-900 border-t border-zinc-800 py-5 px-4 mt-auto">
+        <div class="max-w-md mx-auto text-center">
+            <a href="https://wa.me/51906109349?text=Hola%20Supervisor,%20necesito%20reportar%20una%20emergencia%20o%20condición%20insegura." target="_blank"
+                class="block bg-zinc-950 hover:bg-zinc-900 border-2 border-amber-500/40 hover:border-amber-400 rounded-2xl p-3.5 transition-all shadow-xl group">
+                <div class="text-[11px] uppercase tracking-widest text-amber-400 font-bold mb-0.5">Supervisor de Guardia</div>
+                <div class="text-xl font-black text-white tracking-wider flex items-center justify-center gap-2 group-hover:text-amber-300 transition-colors">
+                    <i class="fa-brands fa-whatsapp text-emerald-500"></i>
+                    <span>+51 906 109 349</span>
+                </div>
+            </a>
+        </div>
+    </footer>
+
+    <div id="reportModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden transition-opacity opacity-0">
+        <div class="bg-zinc-900 border border-zinc-800 w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl transform translate-y-full sm:translate-y-0 transition-transform duration-300" id="modalContent">
+            
+            <div class="flex items-center justify-between pb-4 border-b border-zinc-800 mb-4">
+                <div class="flex items-center gap-3">
+                    <div id="modalIconBox" class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg">
+                        <i id="modalIcon" class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-amber-400">Reporte Inmediato</span>
+                        <h3 id="modalTitle" class="text-lg font-black text-white">Cable Pelado</h3>
+                    </div>
+                </div>
+                <button onclick="closeReportModal()" class="w-9 h-9 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="reportForm" onsubmit="submitReport(event)" class="space-y-4">
+                <input type="hidden" id="hazardType" value="">
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
+                        <i class="fa-solid fa-location-dot text-amber-400 mr-1"></i> Ubicación / Nivel / Rampa <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="hazardLocation" required placeholder="Ej: Nivel 300, Rampa Sur, Labor 402"
+                        class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-amber-500 text-sm font-medium">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
+                        <i class="fa-solid fn-comment-medical text-amber-400 mr-1"></i> Descripción o Detalles (Opcional)
+                    </label>
+                    <textarea id="hazardDesc" rows="2" placeholder="Ej: Cables expuestos sin cinta aislante cerca de la zona de tránsito."
+                        class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-amber-500 text-sm resize-none"></textarea>
+                </div>
+
+                <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 flex items-start gap-3 text-xs text-amber-200">
+                    <i class="fa-solid fa-circle-info text-amber-400 mt-0.5 text-sm"></i>
+                    <div>
+                        Al enviar, se guardará en el panel en tiempo real de todo el equipo y se abrirá WhatsApp con el mensaje para el <strong>Supervisor (+51 906 109 349)</strong>.
+                    </div>
+                </div>
+
+                <div class="pt-2 flex gap-3">
+                    <button type="button" onclick="closeReportModal()" 
+                        class="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold py-3.5 px-4 rounded-xl text-sm transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" 
+                        class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 px-4 rounded-xl text-sm shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-lg"></i>
+                        <span>Enviar y WhatsApp</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="shareModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-zinc-900 border border-zinc-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center">
+            <div class="w-14 h-14 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center text-amber-400 text-2xl mx-auto mb-3">
+                <i class="fa-solid fa-share-nodes"></i>
+            </div>
+            <h3 class="text-lg font-black text-white mb-1">Compartir con el Equipo</h3>
+            <p class="text-xs text-zinc-400 mb-4">Cualquier compañero puede abrir este enlace desde su celular para reportar y ver incidencias en tiempo real.</p>
+            
+            <div class="bg-zinc-950 border border-zinc-800 p-3 rounded-xl mb-4 text-xs font-mono text-amber-300 break-all select-all" id="shareUrlText">
+                Cargando enlace...
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="copyShareUrl()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold py-3 rounded-xl text-xs transition-colors flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-copy"></i> Copiar Enlace
+                </button>
+                <button onclick="closeShareModal()" class="px-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold py-3 rounded-xl text-xs transition-colors">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'reporte-flash-mining';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let db, auth, currentUser = null;
+        let reportsCache = [];
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                currentUser = auth.currentUser;
+
+                // Start listening to public reports collection
+                initCloudSync();
+            } catch (err) {
+                console.error("Firebase init error:", err);
+                document.getElementById('cloudFeedList').innerHTML = `<p class="text-red-400 text-xs text-center py-4">Error conectando a la nube. Modo local activo.</p>`;
+            }
+        });
+
+        function initCloudSync() {
+            if (!db) return;
+            const reportsCol = collection(db, 'artifacts', appId, 'public', 'data', 'reports');
+
+            onSnapshot(reportsCol, (snapshot) => {
+                reportsCache = [];
+                snapshot.forEach(docSnap => {
+                    reportsCache.push({ id: docSnap.id, ...docSnap.data() });
+                });
+
+                // Sort newest first in memory
+                reportsCache.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+                renderFeed(reportsCache);
+            }, (error) => {
+                console.error("Snapshot error:", error);
+            });
+        }
+
+        window.submitReport = async function(event) {
+            event.preventDefault();
+            const hazardType = document.getElementById('hazardType').value;
+            const location = document.getElementById('hazardLocation').value.trim();
+            const description = document.getElementById('hazardDesc').value.trim();
+
+            if (!location) return;
+
+            const dateStr = new Date().toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' });
+            
+            // Save to Firestore cloud if connected
+            if (db) {
+                try {
+                    const reportsCol = collection(db, 'artifacts', appId, 'public', 'data', 'reports');
+                    await addDoc(reportsCol, {
+                        type: hazardType,
+                        location: location,
+                        description: description,
+                        timeStr: dateStr,
+                        timestamp: Date.now(),
+                        status: 'Pendiente',
+                        author: currentUser ? currentUser.uid.substring(0, 6) : 'Anónimo'
+                    });
+                } catch (e) {
+                    console.error("Error saving to cloud:", e);
+                }
+            }
+
+            // Construct WhatsApp message
+            const supervisorNumber = "51906109349";
+            let message = `🚨 *REPORTE FLASH - CONDICIÓN INSEGURA* 🚨\n\n`;
+            message += `⚠️ *Tipo:* ${hazardType}\n`;
+            message += `📍 *Ubicación:* ${location}\n`;
+            if (description) {
+                message += `📝 *Detalles:* ${description}\n`;
+            }
+            message += `⏰ *Hora:* ${dateStr}\n\n`;
+            message += `*(Por favor adjuntar foto de la condición aquí)*`;
+
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/${supervisorNumber}?text=${encodedMessage}`;
+
+            closeReportModal();
+            window.open(whatsappUrl, '_blank');
+            switchTab('feed');
+        };
+
+        function renderFeed(reports) {
+            const container = document.getElementById('cloudFeedList');
+            document.getElementById('badgeCount').textContent = reports.length;
+
+            if (reports.length === 0) {
+                container.innerHTML = `<p class="text-zinc-500 italic text-center py-8 text-xs">No hay reportes registrados aún en la nube.</p>`;
+                return;
+            }
+
+            let html = '';
+            reports.forEach(r => {
+                const badgeColor = r.type.includes('Cable') ? 'bg-orange-500/20 text-orange-300 border-orange-500/30' :
+                                   r.type.includes('Fuga') ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' :
+                                   r.type.includes('Roca') ? 'bg-red-500/20 text-red-300 border-red-500/30' : 'bg-zinc-800 text-zinc-300 border-zinc-700';
+
+                html += `
+                    <div class="bg-zinc-900 border border-zinc-800/80 rounded-xl p-3 shadow">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeColor}">${r.type}</span>
+                            <span class="text-[10px] text-zinc-500 font-mono">${r.timeStr || 'Hace un momento'}</span>
+                        </div>
+                        <div class="text-sm font-bold text-white mb-1 flex items-center gap-1.5">
+                            <i class="fa-solid fa-location-dot text-amber-400 text-xs"></i>
+                            ${r.location}
+                        </div>
+                        ${r.description ? `<p class="text-xs text-zinc-400 mb-2 italic">${r.description}</p>` : ''}
+                        <div class="flex items-center justify-between pt-2 border-t border-zinc-800/60 text-[10px] text-zinc-500">
+                            <span>Ref: #${r.id.substring(0, 6)}</span>
+                            <span class="text-emerald-400 font-semibold flex items-center gap-1">
+                                <i class="fa-solid fa-circle-check"></i> Enviado al supervisor
+                            </span>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        window.switchTab = function(tab) {
+            const btnReport = document.getElementById('tabReport');
+            const btnFeed = document.getElementById('tabFeed');
+            const secReport = document.getElementById('sectionReport');
+            const secFeed = document.getElementById('sectionFeed');
+
+            if (tab === 'report') {
+                btnReport.className = "py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-amber-500 text-zinc-950 transition-all flex items-center justify-center gap-2 shadow";
+                btnFeed.className = "py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-zinc-400 hover:text-white transition-all flex items-center justify-center gap-2";
+                secReport.classList.remove('hidden');
+                secFeed.classList.add('hidden');
+            } else {
+                btnFeed.className = "py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-emerald-500 text-zinc-950 transition-all flex items-center justify-center gap-2 shadow";
+                btnReport.className = "py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-zinc-400 hover:text-white transition-all flex items-center justify-center gap-2";
+                secFeed.classList.remove('hidden');
+                secReport.classList.add('hidden');
+            }
+        };
+
+        window.openReportModal = function(hazardName, colorClass, iconClass) {
+            const modal = document.getElementById('reportModal');
+            const modalContent = document.getElementById('modalContent');
+            const titleEl = document.getElementById('modalTitle');
+            const typeInput = document.getElementById('hazardType');
+            const iconBox = document.getElementById('modalIconBox');
+            const iconEl = document.getElementById('modalIcon');
+
+            titleEl.textContent = hazardName;
+            typeInput.value = hazardName;
+
+            iconBox.className = `w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg ${colorClass}`;
+            iconEl.className = `fa-solid ${iconClass}`;
+
+            document.getElementById('hazardLocation').value = '';
+            document.getElementById('hazardDesc').value = '';
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalContent.classList.remove('translate-y-full');
+            }, 10);
+
+            setTimeout(() => {
+                document.getElementById('hazardLocation').focus();
+            }, 100);
+        };
+
+        window.closeReportModal = function() {
+            const modal = document.getElementById('reportModal');
+            const modalContent = document.getElementById('modalContent');
+
+            modal.classList.add('opacity-0');
+            modalContent.classList.add('translate-y-full');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        };
+
+        window.shareAppURL = function() {
+            const modal = document.getElementById('shareModal');
+            document.getElementById('shareUrlText').textContent = window.location.href;
+            modal.classList.remove('hidden');
+        };
+
+        window.closeShareModal = function() {
+            document.getElementById('shareModal').classList.add('hidden');
+        };
+
+        window.copyShareUrl = function() {
+            const url = window.location.href;
+            const textarea = document.createElement('textarea');
+            textarea.value = url;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                alertBoxCustom("¡Enlace copiado al portapapeles!");
+            } catch (err) {
+                console.error('Failed to copy', err);
+            }
+            document.body.removeChild(textarea);
+            closeShareModal();
+        };
+
+        function alertBoxCustom(msg) {
+            const div = document.createElement('div');
+            div.className = "fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-2xl z-50 animate-bounce";
+            div.textContent = msg;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 2500);
+        }
+    </script>
+</body>
+</html>
