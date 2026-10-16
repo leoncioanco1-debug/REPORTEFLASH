@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporte Flash - Condiciones Inseguras</title>
+    <title>GeoFlash - Control Geomecánico Subterráneo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -27,15 +27,16 @@
         
         <div class="max-w-md mx-auto px-4 py-6 text-center relative z-10">
             <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/10 border-2 border-amber-500/30 text-amber-400 mb-3 shadow-lg shadow-amber-500/10">
-                <i class="fa-solid fa-hard-hat text-3xl"></i>
+                <i class="fa-solid fa-mountain text-3xl"></i>
             </div>
             
             <h1 class="text-3xl font-black tracking-tight text-white uppercase font-sans drop-shadow-md">
-                REPORTE <span class="text-amber-400">FLASH</span>
+                GEO <span class="text-amber-400">FLASH</span>
             </h1>
+            <p class="text-xs text-zinc-400 mt-1 font-semibold">Monitoreo y Alerta Geomecánica Subterránea</p>
             <div class="mt-2 inline-flex items-center gap-2 bg-zinc-800/80 border border-zinc-700/60 px-4 py-1.5 rounded-full text-sm font-semibold text-amber-300">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Modo Nube Activo</span>
+                <span>Nube Activa (Firebase)</span>
             </div>
         </div>
     </header>
@@ -43,10 +44,10 @@
     <div class="max-w-md w-full mx-auto px-4 pt-4">
         <div class="grid grid-cols-2 gap-2 bg-zinc-900 p-1.5 rounded-2xl border border-zinc-800">
             <button onclick="switchTab('report')" id="tabReport" class="py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-amber-500 text-zinc-950 transition-all flex items-center justify-center gap-2 shadow">
-                <i class="fa-solid fa-triangle-exclamation"></i> Reportar
+                <i class="fa-solid fa-triangle-exclamation"></i> Registrar
             </button>
             <button onclick="switchTab('feed')" id="tabFeed" class="py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-zinc-400 hover:text-white transition-all flex items-center justify-center gap-2">
-                <i class="fa-solid fa-tower-broadcast text-emerald-400"></i> Panel en Vivo (<span id="badgeCount">0</span>)
+                <i class="fa-solid fa-tower-broadcast text-emerald-400"></i> Eventos (<span id="badgeCount">0</span>)
             </button>
         </div>
     </div>
@@ -55,68 +56,61 @@
         
         <div id="sectionReport" class="flex flex-col gap-4">
             <p class="text-xs text-center text-zinc-400 font-medium uppercase tracking-wider mb-1">
-                Selecciona la condición insegura detectada
+                Selecciona la condición geomecánica crítica
             </p>
 
-            <!-- Button 1: Cable Pelado -->
-            <button onclick="openReportModal('Cable Pelado', 'bg-orange-600', 'fa-plug-circle-exclamation')" 
+            <!-- Opción 1: Desprendimiento de Roca -->
+            <button onclick="openReportModal('Desprendimiento / Roca Suelta', 'bg-red-600', 'fa-mountain')" 
+                class="group relative w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-5 px-6 rounded-2xl shadow-xl transition-all duration-200 transform active:scale-95 flex items-center justify-between border-2 border-red-400/50">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-black/20 flex items-center justify-center text-2xl text-white group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-mountain"></i>
+                    </div>
+                    <div class="text-left">
+                        <span class="block text-xs uppercase tracking-wider text-red-200 font-semibold">Crítico / Techo o Caja</span>
+                        <span class="text-lg md:text-xl font-black tracking-wide underline decoration-white/40 group-hover:decoration-white">ROCA SUELTA / PLANCHÓN</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right text-red-200 group-hover:translate-x-1 transition-transform"></i>
+            </button>
+
+            <!-- Opción 2: Deformación o Convergencia -->
+            <button onclick="openReportModal('Deformación o Convergencia', 'bg-orange-600', 'fa-arrows-left-right-to-line')" 
                 class="group relative w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold py-5 px-6 rounded-2xl shadow-xl transition-all duration-200 transform active:scale-95 flex items-center justify-between border-2 border-orange-400/50">
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 rounded-xl bg-black/20 flex items-center justify-center text-2xl text-white group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-plug-circle-exclamation"></i>
+                        <i class="fa-solid fa-arrows-left-right-to-line"></i>
                     </div>
                     <div class="text-left">
-                        <span class="block text-xs uppercase tracking-wider text-orange-200 font-semibold">Eléctrico</span>
-                        <span class="text-lg md:text-xl font-black tracking-wide underline decoration-white/40 group-hover:decoration-white">CABLE PELADO</span>
+                        <span class="block text-xs uppercase tracking-wider text-orange-200 font-semibold">Sostenimiento / Daño</span>
+                        <span class="text-lg md:text-xl font-black tracking-wide underline decoration-white/40 group-hover:decoration-white">CONVERGENCIA / SHOTCRETE</span>
                     </div>
                 </div>
                 <i class="fa-solid fa-chevron-right text-orange-200 group-hover:translate-x-1 transition-transform"></i>
             </button>
 
-            <!-- Button 2: Fuga de Aceite / Agua -->
-            <button onclick="openReportModal('Fuga de Aceite / Agua', 'bg-amber-500', 'fa-droplet')" 
+            <!-- Opción 3: Filtración de Agua Estructural -->
+            <button onclick="openReportModal('Filtración / Presión de Agua', 'bg-amber-500', 'fa-droplet')" 
                 class="group relative w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-zinc-950 font-black py-5 px-6 rounded-2xl shadow-xl transition-all duration-200 transform active:scale-95 flex items-center justify-between border-2 border-yellow-300/60">
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 rounded-xl bg-black/10 flex items-center justify-center text-2xl text-zinc-950 group-hover:scale-110 transition-transform">
                         <i class="fa-solid fa-droplet"></i>
                     </div>
                     <div class="text-left">
-                        <span class="block text-xs uppercase tracking-wider text-zinc-800 font-bold">Ambiental / Mecánico</span>
-                        <span class="text-lg md:text-xl font-black tracking-wide underline decoration-zinc-900/40 group-hover:decoration-zinc-900">FUGA DE ACEITE / AGUA</span>
+                        <span class="block text-xs uppercase tracking-wider text-zinc-800 font-bold">Hidrogeología</span>
+                        <span class="text-lg md:text-xl font-black tracking-wide underline decoration-zinc-900/40 group-hover:decoration-zinc-900">FILTRACIÓN O PRESIÓN</span>
                     </div>
                 </div>
                 <i class="fa-solid fa-chevron-right text-zinc-900 group-hover:translate-x-1 transition-transform"></i>
             </button>
 
-            <!-- Button 3: Roca Suelta / Desprendimiento -->
-            <button onclick="openReportModal('Roca Suelta / Desprendimiento', 'bg-red-600', 'fa-mountain')" 
-                class="group relative w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-5 px-6 rounded-2xl shadow-xl transition-all duration-200 transform active:scale-95 flex items-center justify-between border-2 border-red-400/50">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-black/20 flex items-center justify-center text-2xl text-white group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                    </div>
-                    <div class="text-left">
-                        <span class="block text-xs uppercase tracking-wider text-red-200 font-semibold">Geotécnico / Mina</span>
-                        <span class="text-lg md:text-xl font-black tracking-wide underline decoration-white/40 group-hover:decoration-white">ROCA SUELTA / DESPRENDIMIENTO</span>
-                    </div>
-                </div>
-                <i class="fa-solid fa-chevron-right text-red-200 group-hover:translate-x-1 transition-transform"></i>
-            </button>
-
-            <!-- Additional Custom Hazard Button -->
-            <button onclick="openReportModal('Otra Condición Insegura', 'bg-zinc-700', 'fa-circle-exclamation')" 
-                class="w-full bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-semibold py-3.5 px-6 rounded-xl border border-zinc-800 transition-all flex items-center justify-center gap-3 text-sm">
-                <i class="fa-solid fa-plus-circle text-amber-400"></i>
-                <span>Reportar otra condición insegura...</span>
-            </button>
-
             <div class="mt-2 bg-zinc-900/90 border border-zinc-800/80 rounded-2xl p-4 flex items-center gap-4 shadow-lg">
                 <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-2xl animate-bounce">
-                    <i class="fa-solid fa-hand-pointer"></i>
+                    <i class="fa-solid fa-bolt"></i>
                 </div>
                 <div class="text-xs text-zinc-300 leading-relaxed">
-                    <strong class="text-white block mb-0.5">Funcionamiento rápido:</strong>
-                    Toca el botón &rarr; se guarda en la nube y abre WhatsApp &rarr; adjunta la foto y envía.
+                    <strong class="text-white block mb-0.5">Operación Ágil:</strong>
+                    Registra la labor y el evento geomecánico &rarr; se sincroniza en Firebase y dispara la alerta inmediata a WhatsApp.
                 </div>
                 <div class="flex-shrink-0 text-emerald-400 text-2xl">
                     <i class="fa-brands fa-whatsapp"></i>
@@ -127,17 +121,17 @@
         <div id="sectionFeed" class="hidden flex flex-col gap-3">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
-                    <i class="fa-solid fa-satellite-dish text-emerald-400 animate-pulse"></i> Reportes del Equipo en Tiempo Real
+                    <i class="fa-solid fa-satellite-dish text-emerald-400 animate-pulse"></i> Historial Geomecánico Nube
                 </span>
                 <button onclick="shareAppURL()" class="text-xs bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition-colors">
-                    <i class="fa-solid fa-share-nodes"></i> Compartir App
+                    <i class="fa-solid fa-share-nodes"></i> Compartir
                 </button>
             </div>
             
             <div id="cloudFeedList" class="space-y-2.5 max-h-[450px] overflow-y-auto pr-1">
                 <div class="text-center py-10 text-zinc-500 text-xs italic">
                     <i class="fa-solid fa-spinner fa-spin text-amber-400 text-lg mb-2"></i>
-                    <p>Conectando con la nube de reportes...</p>
+                    <p>Sincronizando registros con Firebase...</p>
                 </div>
             </div>
         </div>
@@ -154,9 +148,9 @@
 
     <footer class="bg-zinc-900 border-t border-zinc-800 py-5 px-4 mt-auto">
         <div class="max-w-md mx-auto text-center">
-            <a href="https://wa.me/51906109349?text=Hola%20Supervisor,%20necesito%20reportar%20una%20emergencia%20o%20condición%20insegura." target="_blank"
+            <a href="https://wa.me/51906109349?text=Hola%20Ingeniero%20Geomecánico,%20necesito%20reportar%20una%20alerta%20en%20labor." target="_blank"
                 class="block bg-zinc-950 hover:bg-zinc-900 border-2 border-amber-500/40 hover:border-amber-400 rounded-2xl p-3.5 transition-all shadow-xl group">
-                <div class="text-[11px] uppercase tracking-widest text-amber-400 font-bold mb-0.5">Supervisor de Guardia</div>
+                <div class="text-[11px] uppercase tracking-widest text-amber-400 font-bold mb-0.5">Geomecánico de Guardia</div>
                 <div class="text-xl font-black text-white tracking-wider flex items-center justify-center gap-2 group-hover:text-amber-300 transition-colors">
                     <i class="fa-brands fa-whatsapp text-emerald-500"></i>
                     <span>+51 906 109 349</span>
@@ -172,11 +166,11 @@
             <div class="flex items-center justify-between pb-4 border-b border-zinc-800 mb-4">
                 <div class="flex items-center gap-3">
                     <div id="modalIconBox" class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg">
-                        <i id="modalIcon" class="fa-solid fa-bolt"></i>
+                        <i id="modalIcon" class="fa-solid fa-mountain"></i>
                     </div>
                     <div>
-                        <span class="text-[10px] uppercase font-bold tracking-wider text-amber-400">Reporte Inmediato</span>
-                        <h3 id="modalTitle" class="text-lg font-black text-white">Cable Pelado</h3>
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-amber-400">Alerta Geomecánica</span>
+                        <h3 id="modalTitle" class="text-lg font-black text-white">Roca Suelta</h3>
                     </div>
                 </div>
                 <button onclick="closeReportModal()" class="w-9 h-9 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white flex items-center justify-center transition-colors">
@@ -189,24 +183,24 @@
 
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
-                        <i class="fa-solid fa-location-dot text-amber-400 mr-1"></i> Ubicación / Nivel / Rampa <span class="text-red-500">*</span>
+                        <i class="fa-solid fa-location-dot text-amber-400 mr-1"></i> Nivel / Rampa / Labor / Tajos <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" id="hazardLocation" required placeholder="Ej: Nivel 300, Rampa Sur, Labor 402"
+                    <input type="text" id="hazardLocation" required placeholder="Ej: Nivel 3200, Tajos 402, Rampa Norte"
                         class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-amber-500 text-sm font-medium">
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
-                        <i class="fa-solid fa-comment-medical text-amber-400 mr-1"></i> Descripción o Detalles (Opcional)
+                        <i class="fa-solid fa-comment-medical text-amber-400 mr-1"></i> Observación / Metros cúbicos aprox. (Opcional)
                     </label>
-                    <textarea id="hazardDesc" rows="2" placeholder="Ej: Cables expuestos sin cinta aislante cerca de la zona de tránsito."
+                    <textarea id="hazardDesc" rows="2" placeholder="Ej: Bloque de aprox 0.5m3 en la caja derecha, requiere acuñadura inmediata."
                         class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-amber-500 text-sm resize-none"></textarea>
                 </div>
 
                 <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 flex items-start gap-3 text-xs text-amber-200">
                     <i class="fa-solid fa-circle-info text-amber-400 mt-0.5 text-sm"></i>
                     <div>
-                        Al enviar, se guardará en el panel en tiempo real de todo el equipo y se abrirá WhatsApp con el mensaje para el <strong>Supervisor (+51 906 109 349)</strong>.
+                        Se guardará en la nube del equipo y abrirá WhatsApp para notificar al <strong>Geomecánico (+51 906 109 349)</strong>.
                     </div>
                 </div>
 
@@ -218,7 +212,7 @@
                     <button type="submit" 
                         class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 px-4 rounded-xl text-sm shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2">
                         <i class="fa-brands fa-whatsapp text-lg"></i>
-                        <span>Enviar y WhatsApp</span>
+                        <span>Enviar Alerta</span>
                     </button>
                 </div>
             </form>
@@ -231,8 +225,8 @@
             <div class="w-14 h-14 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center text-amber-400 text-2xl mx-auto mb-3">
                 <i class="fa-solid fa-share-nodes"></i>
             </div>
-            <h3 class="text-lg font-black text-white mb-1">Compartir con el Equipo</h3>
-            <p class="text-xs text-zinc-400 mb-4">Cualquier compañero puede abrir este enlace desde su celular para reportar y ver incidencias en tiempo real.</p>
+            <h3 class="text-lg font-black text-white mb-1">Compartir GeoFlash</h3>
+            <p class="text-xs text-zinc-400 mb-4">Enlace directo para el equipo de operaciones y geomecánica.</p>
             
             <div class="bg-zinc-950 border border-zinc-800 p-3 rounded-xl mb-4 text-xs font-mono text-amber-300 break-all select-all" id="shareUrlText">
                 Cargando enlace...
@@ -240,7 +234,7 @@
 
             <div class="flex gap-2">
                 <button onclick="copyShareUrl()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold py-3 rounded-xl text-xs transition-colors flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-copy"></i> Copiar Enlace
+                    <i class="fa-solid fa-copy"></i> Copiar
                 </button>
                 <button onclick="closeShareModal()" class="px-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold py-3 rounded-xl text-xs transition-colors">
                     Cerrar
@@ -256,9 +250,8 @@
                 <i class="fa-solid fa-hard-hat"></i>
             </div>
             <h3 class="text-lg font-black text-white mb-1">Califícanos</h3>
-            <p class="text-xs text-zinc-400 mb-4">¿Qué tan útil y efectiva ha sido esta herramienta para sus operaciones?</p>
+            <p class="text-xs text-zinc-400 mb-4">¿Qué tan útil es esta herramienta para el control geomecánico?</p>
             
-            <!-- Selector de Casquitos -->
             <div id="hatRatingContainer" class="flex justify-center gap-3 mb-6 text-3xl cursor-pointer text-zinc-600">
                 <i class="fa-solid fa-hard-hat transition-colors hover:text-amber-400" data-value="1"></i>
                 <i class="fa-solid fa-hard-hat transition-colors hover:text-amber-400" data-value="2"></i>
@@ -293,7 +286,7 @@
             measurementId: "G-6MQPMYNCP1"
         };
 
-        const appId = 'reporte-flash-mining';
+        const appId = 'geoflash-mineria';
         let db, auth, currentUser = null;
         let reportsCache = [];
         let selectedRating = 0;
@@ -308,20 +301,19 @@
                     await signInAnonymously(auth);
                     currentUser = auth.currentUser;
                 } catch (authErr) {
-                    console.warn("Auth anónimo no habilitado en Firebase, continuando sin sesión:", authErr.message);
+                    console.warn("Auth anónimo no habilitado:", authErr.message);
                 }
 
                 initCloudSync();
                 setupRatingSystem();
             } catch (err) {
                 console.error("Firebase init error:", err);
-                document.getElementById('cloudFeedList').innerHTML = `<p class="text-red-400 text-xs text-center py-4">Error conectando a la nube: ${err.message}</p>`;
             }
         });
 
         function initCloudSync() {
             if (!db) return;
-            const reportsCol = collection(db, 'artifacts', appId, 'public', 'data', 'reports');
+            const reportsCol = collection(db, 'artifacts', appId, 'public', 'data', 'geohazards');
 
             onSnapshot(reportsCol, (snapshot) => {
                 reportsCache = [];
@@ -333,11 +325,6 @@
                 renderFeed(reportsCache);
             }, (error) => {
                 console.error("Snapshot error:", error);
-                document.getElementById('cloudFeedList').innerHTML = `
-                    <div class="text-red-400 text-xs text-center py-4 px-2">
-                        <p class="font-bold">Falta activar Firestore Database en Firebase</p>
-                        <p class="text-[10px] text-zinc-400 mt-1">Ve a Firebase Console > Firestore Database > Crear base de datos (en Modo de Prueba).</p>
-                    </div>`;
             });
         }
 
@@ -353,33 +340,32 @@
             
             if (db) {
                 try {
-                    const reportsCol = collection(db, 'artifacts', appId, 'public', 'data', 'reports');
+                    const reportsCol = collection(db, 'artifacts', appId, 'public', 'data', 'geohazards');
                     await addDoc(reportsCol, {
                         type: hazardType,
                         location: location,
                         description: description,
                         timeStr: dateStr,
                         timestamp: Date.now(),
-                        status: 'Pendiente',
-                        author: currentUser ? currentUser.uid.substring(0, 6) : 'Equipo'
+                        status: 'Pendiente de Inspección'
                     });
                 } catch (e) {
                     console.error("Error saving to cloud:", e);
                 }
             }
 
-            const supervisorNumber = "51906109349";
-            let message = `🚨 *REPORTE FLASH - CONDICIÓN INSEGURA* 🚨\n\n`;
+            const engineerNumber = "51906109349";
+            let message = `🚨 *ALERTA GEOMECÁNICA SUBTERRÁNEA* 🚨\n\n`;
             message += `⚠️ *Tipo:* ${hazardType}\n`;
             message += `📍 *Ubicación:* ${location}\n`;
             if (description) {
                 message += `📝 *Detalles:* ${description}\n`;
             }
             message += `⏰ *Hora:* ${dateStr}\n\n`;
-            message += `*(Por favor adjuntar foto de la condición aquí)*`;
+            message += `*(Por favor adjuntar foto de la condición geomecánica)*`;
 
             const encodedMessage = encodeURIComponent(message);
-            const whatsappUrl = `https://wa.me/${supervisorNumber}?text=${encodedMessage}`;
+            const whatsappUrl = `https://wa.me/${engineerNumber}?text=${encodedMessage}`;
 
             closeReportModal();
             window.location.href = whatsappUrl;
@@ -390,21 +376,20 @@
             document.getElementById('badgeCount').textContent = reports.length;
 
             if (reports.length === 0) {
-                container.innerHTML = `<p class="text-zinc-500 italic text-center py-8 text-xs">No hay reportes registrados aún en la nube.</p>`;
+                container.innerHTML = `<p class="text-zinc-500 italic text-center py-8 text-xs">No hay alertas geomecánicas registradas.</p>`;
                 return;
             }
 
             let html = '';
             reports.forEach(r => {
-                const badgeColor = r.type.includes('Cable') ? 'bg-orange-500/20 text-orange-300 border-orange-500/30' :
-                                   r.type.includes('Fuga') ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' :
-                                   r.type.includes('Roca') ? 'bg-red-500/20 text-red-300 border-red-500/30' : 'bg-zinc-800 text-zinc-300 border-zinc-700';
+                const badgeColor = r.type.includes('Roca') ? 'bg-red-500/20 text-red-300 border-red-500/30' :
+                                   r.type.includes('Deformación') ? 'bg-orange-500/20 text-orange-300 border-orange-500/30' : 'bg-amber-500/20 text-amber-300 border-amber-500/30';
 
                 html += `
                     <div class="bg-zinc-900 border border-zinc-800/80 rounded-xl p-3 shadow">
                         <div class="flex items-center justify-between mb-1.5">
                             <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeColor}">${r.type}</span>
-                            <span class="text-[10px] text-zinc-500 font-mono">${r.timeStr || 'Hace un momento'}</span>
+                            <span class="text-[10px] text-zinc-500 font-mono">${r.timeStr || 'Reciente'}</span>
                         </div>
                         <div class="text-sm font-bold text-white mb-1 flex items-center gap-1.5">
                             <i class="fa-solid fa-location-dot text-amber-400 text-xs"></i>
@@ -414,7 +399,7 @@
                         <div class="flex items-center justify-between pt-2 border-t border-zinc-800/60 text-[10px] text-zinc-500">
                             <span>Ref: #${r.id.substring(0, 6)}</span>
                             <span class="text-emerald-400 font-semibold flex items-center gap-1">
-                                <i class="fa-solid fa-circle-check"></i> Enviado al supervisor
+                                <i class="fa-solid fa-circle-check"></i> Alerta enviada
                             </span>
                         </div>
                     </div>
@@ -481,7 +466,6 @@
             }, 300);
         };
 
-        // Lógica del Modal de Califícanos
         window.openRateModal = function() {
             const modal = document.getElementById('rateModal');
             const content = document.getElementById('rateModalContent');
@@ -524,7 +508,7 @@
 
         window.submitRating = async function() {
             if (selectedRating === 0) {
-                alertBoxCustom("Por favor selecciona al menos un casquito.");
+                alertBoxCustom("Selecciona al menos un casquito.");
                 return;
             }
 
@@ -534,18 +518,15 @@
                     await addDoc(ratingsCol, {
                         rating: selectedRating,
                         timestamp: Date.now(),
-                        timeStr: new Date().toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' }),
-                        author: currentUser ? currentUser.uid.substring(0, 6) : 'Anónimo'
+                        timeStr: new Date().toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' })
                     });
                 } catch (e) {
-                    console.error("Error saving rating to cloud:", e);
+                    console.error("Error saving rating:", e);
                 }
             }
 
-            alertBoxCustom(`¡Gracias por calificarnos con ${selectedRating} casquitos!`);
+            alertBoxCustom(`¡Gracias por calificar con ${selectedRating} casquitos!`);
             closeRateModal();
-            
-            // Resetear calificación
             selectedRating = 0;
             document.querySelectorAll('#hatRatingContainer i').forEach(h => {
                 h.classList.remove('text-amber-400');
@@ -564,11 +545,8 @@
         };
 
         window.copyShareUrl = function() {
-            const url = window.location.href;
-            navigator.clipboard.writeText(url).then(() => {
-                alertBoxCustom("¡Enlace copiado al portapapeles!");
-            }).catch(err => {
-                console.error('Failed to copy', err);
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                alertBoxCustom("¡Enlace copiado!");
             });
             closeShareModal();
         };
