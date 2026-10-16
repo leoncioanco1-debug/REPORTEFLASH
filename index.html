@@ -35,8 +35,8 @@
             </h1>
             <p class="text-xs text-zinc-400 mt-1 font-semibold">Monitoreo y Alerta Geomecánica Subterránea</p>
             <div class="mt-2 inline-flex items-center gap-2 bg-zinc-800/80 border border-zinc-700/60 px-4 py-1.5 rounded-full text-sm font-semibold text-amber-300">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Nube Activa (Firebase)</span>
+                <span id="connectionDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span id="connectionText">Nube Activa (Firebase)</span>
             </div>
         </div>
     </header>
@@ -109,8 +109,8 @@
                     <i class="fa-solid fa-bolt"></i>
                 </div>
                 <div class="text-xs text-zinc-300 leading-relaxed">
-                    <strong class="text-white block mb-0.5">Operación Ágil:</strong>
-                    Registra la labor y el evento geomecánico &rarr; se sincroniza en Firebase y dispara la alerta inmediata a WhatsApp.
+                    <strong class="text-white block mb-0.5">Operación Ágil (Offline/Online):</strong>
+                    Guarda localmente sin señal y sincroniza en Firebase o dispara la alerta inmediata a WhatsApp.
                 </div>
                 <div class="flex-shrink-0 text-emerald-400 text-2xl">
                     <i class="fa-brands fa-whatsapp"></i>
@@ -121,7 +121,7 @@
         <div id="sectionFeed" class="hidden flex flex-col gap-3">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
-                    <i class="fa-solid fa-satellite-dish text-emerald-400 animate-pulse"></i> Historial Geomecánico Nube
+                    <i class="fa-solid fa-satellite-dish text-emerald-400 animate-pulse"></i> Historial Geomecánico
                 </span>
                 <button onclick="shareAppURL()" class="text-xs bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition-colors">
                     <i class="fa-solid fa-share-nodes"></i> Compartir
@@ -131,7 +131,7 @@
             <div id="cloudFeedList" class="space-y-2.5 max-h-[450px] overflow-y-auto pr-1">
                 <div class="text-center py-10 text-zinc-500 text-xs italic">
                     <i class="fa-solid fa-spinner fa-spin text-amber-400 text-lg mb-2"></i>
-                    <p>Sincronizando registros con Firebase...</p>
+                    <p>Cargando registros...</p>
                 </div>
             </div>
         </div>
@@ -181,26 +181,51 @@
             <form id="reportForm" onsubmit="submitReport(event)" class="space-y-4">
                 <input type="hidden" id="hazardType" value="">
 
+                <!-- LISTA DESPLEGABLE INTELIGENTE: UBICACIÓN -->
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
                         <i class="fa-solid fa-location-dot text-amber-400 mr-1"></i> Nivel / Rampa / Labor / Tajos <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" id="hazardLocation" required placeholder="Ej: Nivel 3200, Tajos 402, Rampa Norte"
-                        class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-amber-500 text-sm font-medium">
+                    <div class="relative">
+                        <input type="text" id="hazardLocation" required list="locationsList" placeholder="Selecciona o escribe la labor..."
+                            class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-amber-500 text-sm font-medium">
+                        <datalist id="locationsList">
+                            <option value="Nivel 3200 - Tajos 402">
+                            <option value="Nivel 3400 - Rampa Norte">
+                            <option value="Nivel 3100 - Crucero Principal">
+                            <option value="Nivel 3300 - Tajos 102">
+                            <option value="Bocamina Principal - Sector Sur">
+                            <option value="Subnivel 3250 - Chimenea 4">
+                        </datalist>
+                    </div>
                 </div>
 
+                <!-- OBSERVACIONES CON BOTONES DE SUGERENCIA RÁPIDA -->
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
-                        <i class="fa-solid fa-comment-medical text-amber-400 mr-1"></i> Observación / Metros cúbicos aprox. (Opcional)
+                        <i class="fa-solid fa-comment-medical text-amber-400 mr-1"></i> Observación / Descripción
                     </label>
-                    <textarea id="hazardDesc" rows="2" placeholder="Ej: Bloque de aprox 0.5m3 en la caja derecha, requiere acuñadura inmediata."
-                        class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-amber-500 text-sm resize-none"></textarea>
+                    <textarea id="hazardDesc" rows="2" placeholder="Describe los detalles o usa las sugerencias rápidas abajo..."
+                        class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-amber-500 text-sm resize-none mb-2"></textarea>
+                    
+                    <!-- Chips de sugerencias rápidas -->
+                    <div class="flex flex-wrap gap-1.5">
+                        <button type="button" onclick="setObservation('Bloque de aprox 0.5m3 en techo, requiere acuñadura inmediata.')" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2.5 py-1 rounded-lg border border-zinc-700 transition-colors">
+                            ⚡ Roca suelta / Planchón
+                        </button>
+                        <button type="button" onclick="setObservation('Presencia de humedad y goteo constante en caja.')" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2.5 py-1 rounded-lg border border-zinc-700 transition-colors">
+                            💧 Filtración de agua
+                        </button>
+                        <button type="button" onclick="setObservation('Fisuras y agrietamiento visible en capa de shotcrete.')" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2.5 py-1 rounded-lg border border-zinc-700 transition-colors">
+                            ⚠️ Convergencia / Shotcrete dañado
+                        </button>
+                    </div>
                 </div>
 
                 <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 flex items-start gap-3 text-xs text-amber-200">
                     <i class="fa-solid fa-circle-info text-amber-400 mt-0.5 text-sm"></i>
                     <div>
-                        Se guardará en la nube del equipo y abrirá WhatsApp para notificar al <strong>Geomecánico (+51 906 109 349)</strong>.
+                        Se guardará localmente (Modo Offline) y abrirá WhatsApp para notificar al <strong>Geomecánico (+51 906 109 349)</strong>.
                     </div>
                 </div>
 
@@ -292,41 +317,108 @@
         let selectedRating = 0;
 
         window.addEventListener('DOMContentLoaded', async () => {
+            // Cargar datos locales inmediatamente (Modo Offline)
+            loadOfflineReports();
+            checkOnlineStatus();
+
+            window.addEventListener('online', () => {
+                checkOnlineStatus();
+                syncOfflineReports();
+            });
+            window.addEventListener('offline', checkOnlineStatus);
+
             try {
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
 
-                try {
-                    await signInAnonymously(auth);
-                    currentUser = auth.currentUser;
-                } catch (authErr) {
-                    console.warn("Auth anónimo no habilitado:", authErr.message);
-                }
+                await signInAnonymously(auth);
+                currentUser = auth.currentUser;
 
                 initCloudSync();
-                setupRatingSystem();
+                syncOfflineReports(); // Sincronizar pendientes al iniciar si hay red
             } catch (err) {
-                console.error("Firebase init error:", err);
+                console.warn("Modo Offline Activo / Sin conexión a Firebase:", err.message);
             }
+
+            setupRatingSystem();
         });
+
+        function checkOnlineStatus() {
+            const dot = document.getElementById('connectionDot');
+            const txt = document.getElementById('connectionText');
+            if (navigator.onLine) {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
+                txt.textContent = "Nube Activa (Firebase)";
+            } else {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
+                txt.textContent = "Modo Offline (Guardando Local)";
+            }
+        }
+
+        function loadOfflineReports() {
+            const localData = localStorage.getItem('geoflash_offline_reports');
+            if (localData) {
+                try {
+                    reportsCache = JSON.parse(localData);
+                    renderFeed(reportsCache);
+                } catch(e) { console.error(e); }
+            }
+        }
+
+        function saveOfflineReport(report) {
+            reportsCache.unshift(report);
+            localStorage.setItem('geoflash_offline_reports', JSON.stringify(reportsCache));
+            renderFeed(reportsCache);
+        }
 
         function initCloudSync() {
             if (!db) return;
             const reportsCol = collection(db, 'artifacts', appId, 'public', 'data', 'geohazards');
 
             onSnapshot(reportsCol, (snapshot) => {
-                reportsCache = [];
+                let cloudReports = [];
                 snapshot.forEach(docSnap => {
-                    reportsCache.push({ id: docSnap.id, ...docSnap.data() });
+                    cloudReports.push({ id: docSnap.id, ...docSnap.data() });
                 });
 
+                // Combinar con locales si hubieran pendientes
+                reportsCache = cloudReports;
                 reportsCache.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                localStorage.setItem('geoflash_offline_reports', JSON.stringify(reportsCache));
                 renderFeed(reportsCache);
             }, (error) => {
-                console.error("Snapshot error:", error);
+                console.warn("Error en tiempo real de nube, usando caché local.");
             });
         }
+
+        async function syncOfflineReports() {
+            if (!db) return;
+            const pending = reportsCache.filter(r => r.isOfflinePending);
+            if (pending.length === 0) return;
+
+            const reportsCol = collection(db, 'artifacts', appId, 'public', 'data', 'geohazards');
+            for (let r of pending) {
+                try {
+                    await addDoc(reportsCol, {
+                        type: r.type,
+                        location: r.location,
+                        description: r.description,
+                        timeStr: r.timeStr,
+                        timestamp: r.timestamp,
+                        status: 'Sincronizado Offline'
+                    });
+                    delete r.isOfflinePending;
+                } catch (e) {
+                    console.error("Fallo al sincronizar pendiente:", e);
+                }
+            }
+            localStorage.setItem('geoflash_offline_reports', JSON.stringify(reportsCache));
+        }
+
+        window.setObservation = function(text) {
+            document.getElementById('hazardDesc').value = text;
+        };
 
         window.submitReport = async function(event) {
             event.preventDefault();
@@ -337,8 +429,21 @@
             if (!location) return;
 
             const dateStr = new Date().toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' });
-            
-            if (db) {
+            const newReport = {
+                id: 'local_' + Date.now(),
+                type: hazardType,
+                location: location,
+                description: description,
+                timeStr: dateStr,
+                timestamp: Date.now(),
+                isOfflinePending: true
+            };
+
+            // Guardar localmente de inmediato (Garantía Offline)
+            saveOfflineReport(newReport);
+
+            // Intentar enviar a Firebase si hay red
+            if (db && navigator.onLine) {
                 try {
                     const reportsCol = collection(db, 'artifacts', appId, 'public', 'data', 'geohazards');
                     await addDoc(reportsCol, {
@@ -347,10 +452,12 @@
                         description: description,
                         timeStr: dateStr,
                         timestamp: Date.now(),
-                        status: 'Pendiente de Inspección'
+                        status: 'Registrado en Nube'
                     });
+                    newReport.isOfflinePending = false;
+                    localStorage.setItem('geoflash_offline_reports', JSON.stringify(reportsCache));
                 } catch (e) {
-                    console.error("Error saving to cloud:", e);
+                    console.warn("Se guardó localmente, pendiente de sincronización.");
                 }
             }
 
@@ -397,9 +504,10 @@
                         </div>
                         ${r.description ? `<p class="text-xs text-zinc-400 mb-2 italic">${r.description}</p>` : ''}
                         <div class="flex items-center justify-between pt-2 border-t border-zinc-800/60 text-[10px] text-zinc-500">
-                            <span>Ref: #${r.id.substring(0, 6)}</span>
-                            <span class="text-emerald-400 font-semibold flex items-center gap-1">
-                                <i class="fa-solid fa-circle-check"></i> Alerta enviada
+                            <span>ID: #${(r.id || '').substring(0, 6)}</span>
+                            <span class="${r.isOfflinePending ? 'text-amber-400' : 'text-emerald-400'} font-semibold flex items-center gap-1">
+                                <i class="fa-solid ${r.isOfflinePending ? 'fa-triangle-exclamation' : 'fa-circle-check'}"></i> 
+                                ${r.isOfflinePending ? 'Guardado Offline' : 'Alerta enviada'}
                             </span>
                         </div>
                     </div>
@@ -512,7 +620,7 @@
                 return;
             }
 
-            if (db) {
+            if (db && navigator.onLine) {
                 try {
                     const ratingsCol = collection(db, 'artifacts', appId, 'public', 'data', 'ratings');
                     await addDoc(ratingsCol, {
