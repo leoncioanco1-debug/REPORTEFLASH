@@ -69,6 +69,8 @@
     max-width:480px;
     margin:0 auto;
     min-height:100dvh;
+    height:100vh;
+    height:100dvh;
     background:var(--bg);
     position:relative;
     display:flex;
@@ -78,9 +80,10 @@
     .phone{ box-shadow:0 0 0 1px var(--line), var(--shadow); }
   }
 
-  .screen{ display:none; flex-direction:column; flex:1; }
+  .screen{ display:none; flex-direction:column; flex:1; min-height:0; }
   .screen.active{ display:flex; }
-  .scroll{ flex:1; overflow-y:auto; padding:20px 18px 110px; }
+  #app-shell{ min-height:0; }
+  .scroll{ flex:1; min-height:0; overflow-y:auto; padding:20px 18px 44px; }
   #screen-login .scroll{ padding-bottom:32px; }
 
   /* ---------- Franja de seguridad ---------- */
@@ -768,8 +771,7 @@
   /* ---------- Barra inferior ---------- */
   .tabbar{
     display:none;
-    position:fixed; bottom:0; left:50%; transform:translateX(-50%);
-    width:min(480px,100%);
+    flex:none; width:100%;
     background:var(--surface);
     border-top:1px solid var(--line);
     padding:8px 6px calc(8px + env(safe-area-inset-bottom));
@@ -1450,9 +1452,7 @@
         </div>
       </div>
     </section>
-  </div>
-
-  <!-- Barra inferior -->
+  <!-- Barra inferior: último bloque de la columna; ocupa su propio espacio y nunca tapa el contenido -->
   <nav class="tabbar" id="tabbar" aria-label="Navegación principal">
     <button type="button" class="tab" data-go="inicio">
       <span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1Z"/></svg></span>
@@ -1475,6 +1475,7 @@
       Accidentes
     </button>
   </nav>
+  </div>
 
   <!-- Modal · Matriz de evaluación -->
   <div class="modal-overlay" id="matriz-modal" hidden>
@@ -3043,5 +3044,4 @@
 </script>
 </body>
 </html>
-
 
