@@ -1586,10 +1586,31 @@
   var diasData = loadJSON("cetemin_dias_v1", { dias: 10, desde: null });
   var stockData = loadJSON("cetemin_stock_v1", {});
   var renovadosData = loadJSON("cetemin_renovados_v1", {});
+  var ssomaOkData = loadJSON("cetemin_ssoma_ok_v1", {});
   var PEDIDOS_SEED = [
     { id: "ped-semilla-1", epp: "Guantes", tipo: "Reposición de stock", cantidad: 20, solicitante: "encargado@cetemin.edu.pe", fecha: "21 oct 2026, 09:00", estado: "Pendiente" }
   ];
   var pedidos = loadJSON("cetemin_pedidos_v1", PEDIDOS_SEED);
+  /* Migración: los pedidos que SSOMA ya aprobó con versiones anteriores no
+     dejaron la marca de «atendido» en el EPP, así que su etiqueta seguiría
+     desactualizada. Se reconstruye la marca desde los pedidos aprobados ya
+     guardados, sin tocar los datos del usuario. */
+  (function(){
+    var cambio = false;
+    pedidos.forEach(function(p){
+      if(p.estado === "Aprobado" && p.epp && !ssomaOkData[p.epp]){
+        ssomaOkData[p.epp] = p.fechaResolucion || p.fecha || "aprobado";
+        cambio = true;
+        if(p.tipo === "Renovación de EPP" && !renovadosData[p.epp]){
+          renovadosData[p.epp] = ssomaOkData[p.epp];
+        }
+      }
+    });
+    if(cambio){
+      saveJSON("cetemin_ssoma_ok_v1", ssomaOkData);
+      saveJSON("cetemin_renovados_v1", renovadosData);
+    }
+  })();
 
   /* ---------- Utilidades ---------- */
   function $(id){ return document.getElementById(id); }
@@ -1883,11 +1904,13 @@
   }
   /* El estado visible de un EPP se calcula del stock real, no del dato fijo:
      sin unidades es «Sin stock» aunque el registro diga otra cosa; con
-     unidades es «Disponible», salvo que siga marcado «Por renovar» y SSOMA
-     aún no haya aprobado su renovación. */
+     unidades es «Disponible», salvo que siga marcado «Por renovar». Esa
+     marca se limpia cuando SSOMA aprueba CUALQUIER pedido de ese EPP
+     (renovación o reposición): el pedido aprobado deja el ítem atendido
+     y, si hay unidades, la etiqueta pasa a «Disponible». */
   function eppEstado(item){
     if(stockDe(item) <= 0) return "Sin stock";
-    if(item.estado === "Por renovar" && !renovadosData[item.nombre]) return "Por renovar";
+    if(item.estado === "Por renovar" && !renovadosData[item.nombre] && !ssomaOkData[item.nombre]) return "Por renovar";
     return "Disponible";
   }
   function itemsBajoMinimo(){
@@ -1916,7 +1939,10 @@
       var stock = stockDe(item);
       var low = stock < item.min;
       var estadoVisible = eppEstado(item);
-      var detVisible = item.det + (renovadosData[item.nombre] ? " · Renovado: " + renovadosData[item.nombre] : "");
+      var detVisible = item.det
+        + (renovadosData[item.nombre]
+          ? " · Renovado: " + renovadosData[item.nombre]
+          : (ssomaOkData[item.nombre] ? " · Pedido aprobado por SSOMA: " + ssomaOkData[item.nombre] : ""));
       var iconSvg = ICONS[item.icon] || ICONS.casco;
       if(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches){
         iconSvg = iconSvg.replace(/#0b2a4a/g, "#ffb800");
@@ -1941,7 +1967,7 @@
         + '<button type="button" class="btn-order" data-order-btn="' + esc(item.nombre) + '">Pedir a SSOMA</button>'
         + '</span><span class="order-hint">El pedido llega a SSOMA como Pendiente; SSOMA lo aprueba desde su panel.</span></span>')
         + '</span>'
-        + '<span class="pill ' + (low ? 'fuera' : eppClass(estadoVisible)) + '">' + (low ? 'Stock bajo' : esc(estadoVisible)) + '</span></div>';
+        + '<span class="pill ' + (low ? 'fuera' : eppClass(estadoVisible)) + '">' + (low && stock > 0 ? 'Stock bajo' : esc(estadoVisible)) + '</span></div>';
     });
     $("epp-list").innerHTML = html;
     $("epp-list").querySelectorAll("[data-stock-delta]").forEach(function(b){
@@ -2056,6 +2082,14 @@
       renovadosData[p.epp] = ahoraTexto();
       saveJSON("cetemin_renovados_v1", renovadosData);
     }
+    if(aprobar){
+      /* Cualquier pedido aprobado por SSOMA —renovación O reposición— deja
+         el EPP atendido: si el ítem estaba marcado «Por renovar», esa
+         etiqueta se limpia y, habiendo unidades, pasa a «Disponible».
+         Antes la reposición solo sumaba stock y la etiqueta no cambiaba. */
+      ssomaOkData[p.epp] = ahoraTexto();
+      saveJSON("cetemin_ssoma_ok_v1", ssomaOkData);
+    }
     saveJSON("cetemin_pedidos_v1", pedidos);
     renderEPP();
     renderPedidos();
@@ -2063,7 +2097,7 @@
     var msg = $("ssoma-saved");
     if(msg && currentScreen === "ssoma"){
       msg.textContent = aprobar
-        ? "Solicitud aprobada («Aprobado») y movida al Historial." + (p.tipo === "Reposición de stock" ? " El stock de " + p.epp + " se actualizó." : "") + (p.tipo === "Renovación de EPP" ? " «" + p.epp + "» quedó como Disponible (renovado)." : "")
+        ? "Solicitud aprobada («Aprobado») y movida al Historial." + (p.tipo === "Reposición de stock" ? " El stock de " + p.epp + " se actualizó y su etiqueta de estado se recalculó." : "") + (p.tipo === "Renovación de EPP" ? " «" + p.epp + "» quedó como Disponible (renovado)." : "")
         : "Solicitud rechazada y movida al Historial.";
       msg.classList.add("show");
       setTimeout(function(){ msg.classList.remove("show"); }, 4000);
@@ -2111,7 +2145,8 @@
       + (pend ? '<span class="pill pendiente">' + pend + ' pedido' + (pend === 1 ? "" : "s") + ' pendiente' + (pend === 1 ? "" : "s") + '</span>' : '<span class="pill aprobado">Sin pedidos pendientes</span>');
     var eppPill = $("home-epp-pill");
     if(eppPill){
-      eppPill.textContent = lows.length ? "Stock bajo" : "Stock en orden";
+      var hayCero = EPP_DATA.some(function(it){ return stockDe(it) <= 0; });
+      eppPill.textContent = hayCero ? "Sin stock" : (lows.length ? "Stock bajo" : "Stock en orden");
       eppPill.className = "pill " + (lows.length ? "fuera" : "op");
     }
     var eppAlert = $("home-epp-alert");
@@ -3008,4 +3043,5 @@
 </script>
 </body>
 </html>
+
 
