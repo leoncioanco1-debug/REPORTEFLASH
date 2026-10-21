@@ -1,699 +1,2983 @@
-<!DOCTYPE html>
-<html lang="es" class="h-full">
+<!doctype html>
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GeoFlash - Control Geomecánico Subterráneo</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .caution-stripes {
-            background: repeating-linear-gradient(
-                45deg,
-                #facc15,
-                #facc15 15px,
-                #18181b 15px,
-                #18181b 30px
-            );
-        }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Equipos y Seguridad CETEMIN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    color-scheme: light dark;
+    --navy:#0b2a4a;
+    --navy-2:#103a66;
+    --navy-3:#081c33;
+    --yellow:#ffb800;
+    --yellow-dark:#8a6100;
+    --bg:#eef1f5;
+    --surface:#ffffff;
+    --surface-2:#f4f6f9;
+    --text:#16222e;
+    --muted:#5b6b7a;
+    --line:#dde3ea;
+    --green:#178a4c;
+    --green-bg:#e2f4e9;
+    --amber:#9a6a00;
+    --amber-bg:#fdf0cd;
+    --orange:#c2510a;
+    --orange-bg:#fde7d7;
+    --red:#c22e1f;
+    --red-bg:#fbe3df;
+    --shadow:0 10px 30px rgba(8,28,51,.14);
+    --radius:14px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#060f1c;
+      --surface:#0e2238;
+      --surface-2:#122c47;
+      --text:#eef3f8;
+      --muted:#9db0c2;
+      --line:#24405e;
+      --green:#4cc983;
+      --green-bg:#123626;
+      --amber:#f2c14e;
+      --amber-bg:#3d2f08;
+      --orange:#f59a52;
+      --orange-bg:#3d2410;
+      --red:#f0806f;
+      --red-bg:#3d1a14;
+      --shadow:0 10px 30px rgba(0,0,0,.45);
+    }
+  }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family:"Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,p,ul,ol,figure{ margin:0; padding:0; }
+  ul,ol{ list-style:none; }
+  button{ font-family:inherit; cursor:pointer; }
+  input,select,textarea{ font-family:inherit; }
+
+  .phone{
+    max-width:480px;
+    margin:0 auto;
+    min-height:100dvh;
+    background:var(--bg);
+    position:relative;
+    display:flex;
+    flex-direction:column;
+  }
+  @media (min-width:560px){
+    .phone{ box-shadow:0 0 0 1px var(--line), var(--shadow); }
+  }
+
+  .screen{ display:none; flex-direction:column; flex:1; }
+  .screen.active{ display:flex; }
+  .scroll{ flex:1; overflow-y:auto; padding:20px 18px 110px; }
+  #screen-login .scroll{ padding-bottom:32px; }
+
+  /* ---------- Franja de seguridad ---------- */
+  .stripe{
+    height:10px;
+    background:repeating-linear-gradient(45deg, var(--yellow) 0 14px, #10151b 14px 28px);
+  }
+
+  /* ---------- Login ---------- */
+  .login-hero{
+    background:linear-gradient(160deg, var(--navy-2), var(--navy) 55%, var(--navy-3));
+    color:#fff;
+    padding:38px 22px 30px;
+  }
+  .mark{
+    width:56px; height:56px; border-radius:14px;
+    background:var(--yellow);
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:18px;
+  }
+  .mark svg{ width:32px; height:32px; }
+  .login-hero h1{
+    font-family:"Barlow Condensed", sans-serif;
+    font-size:2.35rem; line-height:1.02; font-weight:700;
+    letter-spacing:.01em; text-transform:uppercase;
+  }
+  .login-hero h1 span{ color:var(--yellow); }
+  .login-hero .sub{
+    margin-top:10px; font-size:.98rem; color:#c8d6e4; font-weight:500;
+    letter-spacing:.04em;
+  }
+  .login-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:22px 20px;
+    margin-top:-6px;
+  }
+  .field{ margin-bottom:16px; }
+  .field label{
+    display:block; font-size:.82rem; font-weight:700;
+    letter-spacing:.06em; text-transform:uppercase; color:var(--muted);
+    margin-bottom:7px;
+  }
+  .field input, .field select, .field textarea{
+    width:100%; box-sizing:border-box;
+    padding:13px 14px;
+    font-size:1rem; color:var(--text);
+    background:var(--surface-2);
+    border:1.5px solid var(--line);
+    border-radius:10px;
+    outline:none;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    border-color:var(--navy-2);
+    box-shadow:0 0 0 3px rgba(255,184,0,.35);
+  }
+  @media (prefers-color-scheme: dark){
+    .field input:focus, .field select:focus, .field textarea:focus{ border-color:var(--yellow); }
+  }
+  .field textarea{ resize:vertical; min-height:64px; }
+  .btn-primary{
+    width:100%;
+    padding:15px;
+    background:var(--yellow);
+    color:#1a1400;
+    border:none; border-radius:10px;
+    font-size:1.05rem; font-weight:700; letter-spacing:.03em;
+    box-shadow:0 4px 0 #d99e00;
+  }
+  .btn-primary:active{ transform:translateY(2px); box-shadow:0 2px 0 #d99e00; }
+  .form-error{
+    display:none;
+    background:var(--red-bg); color:var(--red);
+    border-radius:8px; padding:10px 12px;
+    font-size:.9rem; font-weight:600; margin-bottom:14px;
+  }
+  .form-error.show{ display:block; }
+  .demo-box{
+    margin-top:20px;
+    border:1.5px dashed var(--line);
+    border-radius:var(--radius);
+    padding:16px;
+    background:var(--surface-2);
+  }
+  .demo-box h2{ font-size:.8rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+  .demo-access{
+    width:100%; text-align:left;
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    padding:12px 14px; margin-bottom:10px; color:var(--text);
+  }
+  .demo-access:last-child{ margin-bottom:0; }
+  .demo-access .who{ font-weight:700; font-size:.95rem; }
+  .demo-access .cred{ display:block; font-size:.82rem; color:var(--muted); font-weight:500; margin-top:2px; }
+  .demo-access .go{
+    background:var(--navy); color:#fff; font-size:.78rem; font-weight:700;
+    padding:6px 10px; border-radius:999px; white-space:nowrap;
+  }
+  @media (prefers-color-scheme: dark){ .demo-access .go{ background:var(--yellow); color:#1a1400; } }
+  .login-foot{
+    text-align:center; margin-top:22px;
+    font-size:.92rem; color:var(--muted); font-weight:600; letter-spacing:.05em;
+  }
+
+  /* ---------- Encabezado de app ---------- */
+  .appbar{
+    background:var(--navy);
+    color:#fff;
+    padding:16px 18px 14px;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    position:sticky; top:0; z-index:5;
+  }
+  .appbar .brand{ display:flex; align-items:center; gap:10px; min-width:0; }
+  .appbar .brand .mini{
+    width:36px; height:36px; border-radius:9px; background:var(--yellow);
+    display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .appbar .brand .mini svg{ width:21px; height:21px; }
+  .appbar .brand strong{
+    font-family:"Barlow Condensed", sans-serif; text-transform:uppercase;
+    font-size:1.12rem; letter-spacing:.03em; line-height:1.05; display:block;
+  }
+  .appbar .brand small{ color:#b9cbdd; font-size:.76rem; font-weight:600; letter-spacing:.05em; }
+  .btn-salir{
+    background:transparent; color:#fff;
+    border:1.5px solid rgba(255,255,255,.45);
+    border-radius:999px; padding:7px 14px;
+    font-size:.85rem; font-weight:700; flex:none;
+  }
+  .btn-salir:active{ background:rgba(255,255,255,.15); }
+
+  .page-title{
+    font-family:"Barlow Condensed", sans-serif;
+    font-size:1.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.02em;
+    margin-bottom:4px;
+  }
+  .page-sub{ color:var(--muted); font-size:.95rem; margin-bottom:18px; }
+
+  .btn-back{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--surface); color:var(--text);
+    border:1.5px solid var(--line); border-radius:999px;
+    padding:8px 14px 8px 10px; font-weight:700; font-size:.9rem;
+    margin-bottom:16px;
+  }
+  .btn-back svg{ width:16px; height:16px; }
+
+  /* ---------- Carrusel superior ---------- */
+  .carousel{
+    background:linear-gradient(155deg, var(--navy-2), var(--navy) 60%, var(--navy-3));
+    color:#fff; border-radius:18px;
+    box-shadow:var(--shadow);
+    position:relative; overflow:hidden;
+  }
+  .car-track{ display:flex; transition:transform .55s ease; }
+  .car-slide{
+    min-width:100%; box-sizing:border-box;
+    padding:24px 48px 42px;
+    position:relative;
+  }
+  .slide-dias::after{
+    content:""; position:absolute; right:-34px; top:-34px;
+    width:130px; height:130px; border-radius:50%;
+    border:22px solid rgba(255,184,0,.16);
+    pointer-events:none;
+  }
+  .car-slide .lbl{
+    font-size:.82rem; font-weight:700; letter-spacing:.22em; text-transform:uppercase;
+    color:#c8d6e4;
+  }
+  .car-btn{
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:34px; height:34px; border-radius:50%;
+    border:1px solid rgba(255,255,255,.35);
+    background:rgba(0,0,0,.25); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    z-index:3; padding:0;
+  }
+  .car-btn svg{ width:18px; height:18px; }
+  .car-btn.prev{ left:8px; }
+  .car-btn.next{ right:8px; }
+  .car-btn:active{ background:rgba(255,255,255,.2); }
+  .car-dots{
+    position:absolute; left:0; right:0; bottom:13px;
+    display:flex; justify-content:center; gap:7px; z-index:3;
+  }
+  .car-dot{
+    width:8px; height:8px; border-radius:99px; border:none; padding:0;
+    background:rgba(255,255,255,.35);
+  }
+  .car-dot.on{ background:var(--yellow); width:24px; }
+  .grav-wrap{ display:flex; gap:12px; margin:14px 0 12px; position:relative; z-index:1; }
+  .grav-box{
+    flex:1; background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.16); border-radius:12px;
+    padding:14px 8px; text-align:center;
+  }
+  .grav-num{
+    font-family:"Barlow Condensed", sans-serif;
+    font-size:3.4rem; font-weight:700; line-height:1;
+  }
+  .grav-num.leves{ color:var(--yellow); }
+  .grav-num.graves{ color:#ff8a7a; }
+  .grav-lbl{
+    font-size:.78rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+    color:#c8d6e4; margin-top:6px;
+  }
+  .stock-big{
+    font-family:"Barlow Condensed", sans-serif;
+    font-size:1.95rem; font-weight:700; line-height:1.12; margin:10px 0 4px;
+    position:relative; z-index:1;
+  }
+  .stock-big.alert{ color:#ff8a7a; }
+  .stock-line{
+    color:#c8d6e4; font-size:.95rem; font-weight:500; margin-top:6px;
+    position:relative; z-index:1;
+  }
+  .stock-line strong{ color:#fff; }
+  .dias-num{
+    font-family:"Barlow Condensed", sans-serif;
+    font-size:6.2rem; line-height:.95; font-weight:700; color:var(--yellow);
+    margin:2px 0 0;
+  }
+  .car-slide .since{ color:#c8d6e4; font-size:.92rem; font-weight:500; position:relative; z-index:1; }
+  .btn-reset{
+    margin-top:16px; position:relative; z-index:1;
+    background:transparent; color:#f3c1bb;
+    border:1px solid rgba(255,255,255,.35);
+    border-radius:8px; padding:8px 12px; font-size:.82rem; font-weight:600;
+  }
+  .reset-confirm{
+    display:none; margin-top:14px; position:relative; z-index:1;
+    background:rgba(0,0,0,.28); border-radius:10px; padding:12px;
+    font-size:.9rem;
+  }
+  .reset-confirm.show{ display:block; }
+  .reset-confirm .row{ display:flex; gap:8px; margin-top:10px; }
+  .reset-confirm button{
+    flex:1; padding:9px; border-radius:8px; border:none; font-weight:700; font-size:.88rem;
+  }
+  .reset-confirm .yes{ background:#d93a2b; color:#fff; }
+  .reset-confirm .no{ background:rgba(255,255,255,.18); color:#fff; }
+
+  .panel-note{
+    margin:16px 2px 20px; color:var(--muted); font-size:.92rem; font-weight:500;
+    display:flex; gap:8px; align-items:flex-start;
+  }
+  .panel-note svg{ width:17px; height:17px; flex:none; margin-top:2px; }
+
+  /* ---------- Botones grandes del panel ---------- */
+  .menu-btn{
+    width:100%; text-align:left;
+    display:flex; align-items:center; gap:16px;
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); padding:18px;
+    margin-bottom:14px; color:var(--text);
+    box-shadow:0 2px 8px rgba(8,28,51,.06);
+  }
+  .menu-btn:active{ transform:scale(.99); }
+  .menu-btn .ic{
+    width:54px; height:54px; border-radius:12px; flex:none;
+    background:var(--navy); display:flex; align-items:center; justify-content:center;
+  }
+  .menu-btn .ic svg{ width:28px; height:28px; }
+  .menu-btn .ic.yel{ background:var(--yellow); }
+  .menu-btn h3{
+    font-family:"Barlow Condensed", sans-serif;
+    font-size:1.45rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; line-height:1;
+  }
+  .menu-btn p{ color:var(--muted); font-size:.9rem; margin-top:4px; font-weight:500; }
+  .menu-btn .chev{ margin-left:auto; color:var(--muted); flex:none; }
+  .menu-btn .chev svg{ width:20px; height:20px; display:block; }
+  .user-chip{
+    display:flex; align-items:center; gap:10px;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:13px 16px; margin-top:6px;
+  }
+  .user-chip .avatar{
+    width:38px; height:38px; border-radius:50%; background:var(--yellow);
+    color:#1a1400; font-weight:700; display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .user-chip strong{ display:block; font-size:.95rem; word-break:break-all; }
+  .user-chip small{ color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.06em; font-size:.72rem; }
+
+  /* ---------- Etiquetas de estado ---------- */
+  .pill{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:.76rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+    padding:5px 10px; border-radius:999px; white-space:nowrap;
+  }
+  .pill::before{ content:""; width:7px; height:7px; border-radius:50%; background:currentColor; }
+  .pill.op{ background:var(--green-bg); color:var(--green); }
+  .pill.mant{ background:var(--amber-bg); color:var(--amber); }
+  .pill.fuera{ background:var(--red-bg); color:var(--red); }
+  .pill.renovar{ background:var(--orange-bg); color:var(--orange); }
+
+  /* ---------- Lista de equipos ---------- */
+  .eq-card{
+    width:100%; text-align:left;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:16px; margin-bottom:12px; color:var(--text);
+    display:block;
+  }
+  .eq-card .top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .eq-card h3{ font-size:1.08rem; font-weight:700; line-height:1.2; }
+  .eq-card .tipo{ color:var(--muted); font-size:.9rem; font-weight:500; margin-top:3px; }
+  .eq-card .meta{
+    display:flex; gap:14px; margin-top:12px; padding-top:11px;
+    border-top:1px solid var(--line);
+    font-size:.85rem; color:var(--muted); font-weight:600; flex-wrap:wrap;
+  }
+  .eq-card .meta span{ display:inline-flex; align-items:center; gap:5px; }
+  .eq-card .meta svg{ width:14px; height:14px; }
+
+  /* ---------- Detalle ---------- */
+  .detail-head h2{
+    font-family:"Barlow Condensed", sans-serif;
+    font-size:2rem; font-weight:700; line-height:1.05; text-transform:uppercase;
+  }
+  .detail-head{ margin-bottom:16px; display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .info-card, .form-card, .hist-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px; margin-bottom:16px;
+  }
+  .info-card h3, .form-card h3, .hist-card h3{
+    font-size:.82rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--muted); margin-bottom:14px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .info-card h3 svg, .form-card h3 svg, .hist-card h3 svg{ width:16px; height:16px; }
+  .info-row{
+    display:flex; justify-content:space-between; gap:14px;
+    padding:9px 0; border-bottom:1px solid var(--line); font-size:.97rem;
+  }
+  .info-row:last-child{ border-bottom:none; padding-bottom:0; }
+  .info-row .k{ color:var(--muted); font-weight:600; flex:none; }
+  .info-row .v{ font-weight:600; text-align:right; }
+  .hist-item{
+    display:flex; gap:12px; padding:11px 0; border-bottom:1px solid var(--line);
+  }
+  .hist-item:last-child{ border-bottom:none; padding-bottom:0; }
+  .hist-item .dot{
+    width:10px; height:10px; border-radius:50%; margin-top:6px; flex:none;
+    background:var(--muted);
+  }
+  .hist-item .dot.op{ background:var(--green); }
+  .hist-item .dot.mant{ background:#d99e00; }
+  .hist-item .dot.fuera{ background:#d93a2b; }
+  .hist-item .when{ font-size:.8rem; color:var(--muted); font-weight:600; }
+  .hist-item .what{ font-weight:700; font-size:.95rem; margin-top:1px; }
+  .hist-item .cmt{ font-size:.92rem; color:var(--muted); margin-top:2px; }
+  .empty-note{ color:var(--muted); font-size:.93rem; font-weight:500; }
+  .saved-msg{
+    display:none; background:var(--green-bg); color:var(--green);
+    border-radius:8px; padding:10px 12px; font-weight:700; font-size:.9rem; margin-top:12px;
+  }
+  .saved-msg.show{ display:block; }
+
+  /* ---------- EPP ---------- */
+  .epp-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:16px; margin-bottom:12px;
+    display:flex; gap:14px; align-items:flex-start;
+  }
+  .epp-card .ic{
+    width:46px; height:46px; border-radius:11px; flex:none;
+    background:var(--surface-2); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .epp-card .ic svg{ width:24px; height:24px; }
+  .epp-card h3{ font-size:1.02rem; font-weight:700; }
+  .epp-card .det{ color:var(--muted); font-size:.9rem; font-weight:500; margin-top:3px; }
+  .epp-card .pill{ margin-left:auto; flex:none; }
+  .steps-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px; margin-top:20px;
+  }
+  .steps-card h3{ font-size:1.05rem; font-weight:700; margin-bottom:12px; }
+  .steps-card ol{ counter-reset:paso; }
+  .steps-card li{
+    counter-increment:paso;
+    display:flex; gap:12px; align-items:flex-start;
+    padding:8px 0; font-size:.96rem; font-weight:500;
+  }
+  .steps-card li::before{
+    content:counter(paso);
+    width:26px; height:26px; border-radius:50%; flex:none;
+    background:var(--navy); color:#fff; font-weight:700; font-size:.85rem;
+    display:flex; align-items:center; justify-content:center;
+  }
+  @media (prefers-color-scheme: dark){
+    .steps-card li::before{ background:var(--yellow); color:#1a1400; }
+  }
+
+  /* ---------- IPERC ---------- */
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .two-col .field{ margin-bottom:16px; }
+  .calif-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:18px; }
+  .calif-btn{
+    padding:12px 4px; border-radius:10px; border:2px solid var(--line);
+    background:var(--surface-2); color:var(--muted);
+    font-weight:700; font-size:.92rem;
+  }
+  .calif-btn[data-level="Bajo"].sel{ background:var(--green-bg); border-color:var(--green); color:var(--green); }
+  .calif-btn[data-level="Medio"].sel{ background:var(--amber-bg); border-color:#d99e00; color:var(--amber); }
+  .calif-btn[data-level="Alto"].sel{ background:var(--orange-bg); border-color:#e86a17; color:var(--orange); }
+  .calif-btn[data-level="Crítico"].sel{ background:var(--red-bg); border-color:#d93a2b; color:var(--red); }
+  .iperc-item{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:15px 16px; margin-bottom:12px;
+  }
+  .iperc-item .top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .iperc-item h3{ font-size:1rem; font-weight:700; line-height:1.25; }
+  .iperc-item .when{ font-size:.8rem; color:var(--muted); font-weight:600; margin-top:2px; }
+  .iperc-item .grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:8px 14px; margin-top:11px;
+    font-size:.9rem;
+  }
+  .iperc-item .grid .k{ color:var(--muted); font-weight:600; font-size:.78rem; text-transform:uppercase; letter-spacing:.05em; display:block; }
+  .iperc-item .grid .v{ font-weight:600; }
+  .btn-del{
+    background:transparent; border:1px solid var(--line); color:var(--red);
+    border-radius:8px; padding:6px 11px; font-size:.82rem; font-weight:700; flex:none;
+  }
+  .ssoma-box{
+    margin-top:22px; border:1.5px dashed var(--line); border-radius:var(--radius);
+    padding:16px; background:var(--surface-2);
+  }
+  .btn-ssoma{
+    width:100%; background:var(--navy); color:#fff; border:none; border-radius:10px;
+    padding:13px; font-weight:700; font-size:.98rem; letter-spacing:.03em;
+  }
+  @media (prefers-color-scheme: dark){ .btn-ssoma{ background:var(--yellow); color:#1a1400; } }
+  .ssoma-text{ display:none; margin-top:13px; font-size:.94rem; line-height:1.5; color:var(--text); }
+  .ssoma-text.show{ display:block; }
+  .section-h{
+    font-family:"Barlow Condensed", sans-serif; font-size:1.35rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.03em; margin:26px 0 12px;
+  }
+
+  /* ---------- IPERC continuo (formato SSOMA) ---------- */
+  .fsec{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    margin-bottom:16px; overflow:hidden;
+  }
+  .fsec > h3{
+    background:var(--surface-2); border-bottom:1px solid var(--line);
+    padding:11px 14px; font-size:.84rem; font-weight:700; letter-spacing:.05em;
+    text-transform:uppercase; text-align:center;
+  }
+  .fsec-body{ padding:16px; }
+  .btn-add{
+    background:var(--surface); border:1.5px solid var(--line); color:var(--navy);
+    border-radius:9px; padding:10px 14px; font-weight:700; font-size:.92rem;
+  }
+  @media (prefers-color-scheme: dark){ .btn-add{ color:var(--yellow); } }
+  .btn-mini{
+    background:var(--surface-2); border:1px solid var(--line); color:var(--text);
+    border-radius:8px; padding:7px 12px; font-size:.85rem; font-weight:700;
+  }
+  .btn-mini-del{
+    background:transparent; border:1px solid var(--line); color:var(--red);
+    border-radius:8px; padding:5px 10px; font-size:.8rem; font-weight:700; flex:none;
+  }
+  .wrow{ border:1px solid var(--line); border-radius:10px; padding:13px; margin-bottom:12px; }
+  .wrow-head{
+    display:flex; justify-content:space-between; align-items:center; gap:8px;
+    margin-bottom:10px; font-weight:700; font-size:.92rem;
+  }
+  .wrow .field{ margin-bottom:10px; }
+  .srow{ display:flex; gap:9px; align-items:center; margin-bottom:10px; }
+  .s-num{
+    width:26px; height:26px; border-radius:50%; flex:none;
+    background:var(--navy); color:#fff; font-weight:700; font-size:.85rem;
+    display:flex; align-items:center; justify-content:center;
+  }
+  @media (prefers-color-scheme: dark){ .s-num{ background:var(--yellow); color:#1a1400; } }
+  .srow input{
+    flex:1; min-width:0; padding:11px 12px; font-size:.95rem; color:var(--text);
+    background:var(--surface-2); border:1.5px solid var(--line); border-radius:10px; outline:none;
+  }
+  .srow input:focus{ border-color:var(--navy-2); }
+  .eval-card{
+    border:1.5px solid var(--line); border-radius:12px; padding:14px; margin-bottom:14px;
+    background:var(--surface);
+  }
+  .eval-head{
+    display:flex; justify-content:space-between; align-items:center; gap:8px;
+    margin-bottom:12px; font-weight:800; font-size:.95rem;
+  }
+  .eval-group{
+    background:var(--surface-2); border:1px solid var(--line); border-radius:10px;
+    padding:11px 12px; margin-bottom:14px;
+  }
+  .eval-group-t{
+    display:block; font-size:.78rem; font-weight:700; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--muted); margin-bottom:9px;
+  }
+  .eval-line{ display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+  .chip{
+    width:34px; height:34px; border-radius:8px; flex:none;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:.95rem; opacity:.3;
+  }
+  .chip.a{ background:#df2015; color:#fff; }
+  .chip.m{ background:#ffd21f; color:#4a3800; }
+  .chip.b{ background:#12913e; color:#fff; }
+  .chip.on{ opacity:1; box-shadow:0 0 0 2px var(--surface-2), 0 0 0 4px var(--text); }
+  .eval-value{
+    min-width:54px; height:38px; border-radius:9px; padding:0 10px; flex:none;
+    border:2px dashed var(--line); background:var(--surface); color:var(--muted);
+    font-weight:800; font-size:1.12rem;
+  }
+  .eval-value.alto{ background:#df2015; border:2px solid #df2015; color:#fff; }
+  .eval-value.medio{ background:#ffd21f; border:2px solid #d9ad00; color:#4a3800; }
+  .eval-value.bajo{ background:#12913e; border:2px solid #12913e; color:#fff; }
+  .btn-matriz{
+    background:#2b6cb0; color:#fff; border:none; border-radius:8px;
+    padding:10px 16px; font-weight:700; font-size:.92rem; flex:none;
+  }
+  .btn-matriz:active{ transform:scale(.97); }
+  .eval-det{ font-size:.83rem; color:var(--muted); margin-top:9px; font-weight:500; line-height:1.4; }
+  .adj-zone{
+    display:block; border:2px dashed var(--line); border-radius:12px; padding:18px 14px;
+    text-align:center; background:var(--surface-2); cursor:pointer;
+  }
+  .adj-zone strong{ display:block; font-size:.98rem; margin-bottom:4px; }
+  .adj-zone span{ color:var(--muted); font-size:.87rem; font-weight:500; }
+  #adj-preview{ margin-top:12px; }
+  #adj-preview:empty{ margin-top:0; }
+  #adj-preview img{ width:100%; border-radius:10px; display:block; margin-bottom:8px; }
+  .eval-sum{ margin-top:11px; padding-top:11px; border-top:1px solid var(--line); }
+  .eval-sum-p{ font-weight:600; font-size:.93rem; }
+  .eval-sum-pills{ display:flex; align-items:center; gap:7px; margin-top:7px; flex-wrap:wrap; }
+  .eval-sum-pills .arrow{ color:var(--muted); font-weight:700; }
+  .item-actions{ display:flex; gap:8px; margin-top:13px; flex-wrap:wrap; }
+  .iperc-detail{ display:none; margin-top:12px; border-top:1px solid var(--line); padding-top:10px; font-size:.92rem; }
+  .iperc-detail.show{ display:block; }
+  .iperc-detail p{ margin:3px 0; line-height:1.45; }
+  .iperc-detail h4{
+    font-size:.78rem; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--muted); margin:13px 0 5px;
+  }
+  .iperc-detail img{ width:100%; border-radius:10px; display:block; margin-top:6px; }
+
+  /* ---------- Modal matriz ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:60; background:rgba(5,14,24,.65);
+    display:flex; align-items:flex-start; justify-content:center;
+    overflow-y:auto; padding:16px 12px; box-sizing:border-box;
+  }
+  .modal-overlay[hidden]{ display:none; }
+  .modal-card{
+    background:var(--surface); color:var(--text); border-radius:16px; box-shadow:var(--shadow);
+    width:100%; max-width:520px; padding:18px 16px; margin:auto 0; box-sizing:border-box;
+  }
+  .modal-head{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .modal-head h3{
+    font-family:"Barlow Condensed", sans-serif; font-size:1.45rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.02em;
+  }
+  .modal-close{
+    background:var(--surface-2); border:1px solid var(--line); color:var(--text);
+    width:34px; height:34px; border-radius:50%; font-size:1.25rem; line-height:1; flex:none;
+  }
+  .modal-sub{ font-weight:700; margin-top:6px; font-size:.98rem; }
+  .modal-hint{ color:var(--muted); font-size:.87rem; margin-top:2px; }
+  .matriz-table{ width:100%; border-collapse:separate; border-spacing:3px; margin-top:12px; table-layout:fixed; }
+  .matriz-table td{ padding:0; }
+  .sev-cell{ font-size:.78rem; font-weight:700; text-align:left; line-height:1.15; padding-right:2px; width:84px; }
+  .sev-cell .n{ color:var(--muted); font-weight:600; }
+  .mcell{
+    width:100%; min-width:34px; height:38px; border:none; border-radius:6px;
+    font-weight:800; font-size:.98rem; padding:0;
+  }
+  .mcell.alto{ background:#df2015; color:#fff; }
+  .mcell.medio{ background:#ffd21f; color:#4a3800; }
+  .mcell.bajo{ background:#12913e; color:#fff; }
+  .mcell.sel{ box-shadow:0 0 0 2.5px var(--surface), 0 0 0 5px var(--text); }
+  .freq-letter{ text-align:center; font-weight:800; font-size:.9rem; padding-top:2px; }
+  .freq-name{ text-align:center; font-size:.58rem; color:var(--muted); line-height:1.15; font-weight:600; }
+  .freq-bar{
+    background:#ffd21f; color:#4a3800; text-align:center; font-weight:800;
+    letter-spacing:.16em; font-size:.78rem; border-radius:6px; padding:5px; margin-top:5px;
+  }
+  .legend{ margin-top:8px; }
+  .legend-item{
+    display:grid; grid-template-columns:58px 1fr; gap:3px 10px;
+    padding:9px 0; border-top:1px solid var(--line); font-size:.84rem; align-items:start;
+  }
+  .legend-badge{ text-align:center; font-weight:800; border-radius:6px; padding:5px 2px; font-size:.78rem; }
+  .legend-badge.alto{ background:#df2015; color:#fff; }
+  .legend-badge.medio{ background:#ffd21f; color:#4a3800; }
+  .legend-badge.bajo{ background:#12913e; color:#fff; }
+  .legend-plazo{ grid-column:2; font-weight:800; font-size:.78rem; letter-spacing:.04em; }
+  .legend-cap{ color:var(--muted); font-size:.8rem; margin-top:6px; }
+
+  /* ---------- Accidentes ---------- */
+  .btn-acc-link{
+    margin-top:12px; position:relative; z-index:1; width:100%;
+    background:var(--yellow); color:#1a1400; border:none; border-radius:9px;
+    padding:11px 12px; font-size:.92rem; font-weight:800; letter-spacing:.02em;
+  }
+  .btn-acc-link:active{ transform:scale(.99); }
+  .explain-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px; margin-bottom:16px;
+  }
+  .explain-card h3{ font-size:1.05rem; font-weight:700; margin-bottom:10px; }
+  .explain-card p{ font-size:.95rem; line-height:1.5; margin-bottom:10px; }
+  .explain-card p:last-child{ margin-bottom:0; }
+  .explain-card strong{ color:var(--text); }
+  .diff-box{
+    border:1px solid var(--line); border-radius:10px; padding:13px; margin-bottom:10px;
+    background:var(--surface-2);
+  }
+  .diff-box:last-child{ margin-bottom:0; }
+  .diff-box .tag{
+    display:inline-block; font-size:.74rem; font-weight:800; letter-spacing:.07em; text-transform:uppercase;
+    padding:4px 9px; border-radius:999px; margin-bottom:7px;
+  }
+  .diff-box .tag.antes{ background:var(--green-bg); color:var(--green); }
+  .diff-box .tag.despues{ background:var(--red-bg); color:var(--red); }
+  .diff-box p{ margin:0; font-size:.93rem; }
+
+  /* ---------- Inventario / stock ---------- */
+  .eq-summary{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+  .alert-banner{
+    background:var(--red-bg); color:var(--red);
+    border:1.5px solid var(--red); border-radius:var(--radius);
+    padding:14px 16px; margin-bottom:14px;
+  }
+  .alert-banner h3{
+    font-size:1rem; font-weight:800; margin-bottom:8px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .alert-banner h3 svg{ width:19px; height:19px; flex:none; }
+  .alert-banner ul{ list-style:disc; margin:0 0 8px 20px; font-size:.93rem; font-weight:600; }
+  .alert-banner p{ font-size:.9rem; font-weight:500; }
+  .epp-card.low{ border:1.5px solid var(--red); }
+  .stock-row{ display:flex; align-items:center; gap:9px; margin-top:10px; flex-wrap:wrap; }
+  .btn-stock{
+    width:34px; height:34px; border-radius:9px; flex:none;
+    border:1.5px solid var(--line); background:var(--surface); color:var(--text);
+    font-size:1.2rem; font-weight:800; line-height:1; padding:0;
+  }
+  .btn-stock:active{ transform:scale(.94); }
+  .stock-num{ font-weight:800; font-size:1.02rem; }
+  .stock-min{ color:var(--muted); font-size:.84rem; font-weight:600; }
+  .stock-min.low{ color:var(--red); font-weight:800; }
+
+  /* ---------- Hora automática bloqueada ---------- */
+  .field-hint{ font-size:.8rem; color:var(--muted); font-weight:500; margin-top:6px; line-height:1.4; }
+  input.hora-lock{
+    font-variant-numeric:tabular-nums; font-weight:700; letter-spacing:.1em;
+    color:var(--muted);
+  }
+
+  /* ---------- Contadores por gravedad / vínculo IPERC ---------- */
+  .acc-stats{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+  .acc-stat{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:16px 10px; text-align:center;
+  }
+  .acc-stat .n{
+    font-family:"Barlow Condensed", sans-serif;
+    font-size:2.7rem; font-weight:700; line-height:1; display:block; color:var(--amber);
+  }
+  .acc-stat .n.grave{ color:var(--red); }
+  .acc-stat .t{
+    font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em;
+    color:var(--muted); display:block; margin-top:7px;
+  }
+  .link-box{
+    border-radius:10px; padding:13px 14px; margin-bottom:16px;
+    font-size:.93rem; line-height:1.45;
+  }
+  .link-box strong{ display:block; margin-bottom:3px; }
+  .link-box.ok{ background:var(--green-bg); color:var(--green); border:1px solid var(--green); }
+  .link-box.falta{ background:var(--amber-bg); color:var(--amber); border:1px solid var(--amber); }
+  .link-box .fname{ font-weight:700; }
+
+  /* ---------- Barra inferior ---------- */
+  .tabbar{
+    display:none;
+    position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+    width:min(480px,100%);
+    background:var(--surface);
+    border-top:1px solid var(--line);
+    padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+    z-index:20;
+    box-shadow:0 -6px 20px rgba(8,28,51,.08);
+  }
+  .tabbar.show{ display:flex; }
+  .tab{
+    flex:1; background:none; border:none; color:var(--muted);
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    padding:6px 2px; font-size:.74rem; font-weight:700; letter-spacing:.04em;
+    border-radius:10px;
+  }
+  .tab svg{ width:23px; height:23px; }
+  .tab.active{ color:var(--navy); }
+  @media (prefers-color-scheme: dark){ .tab.active{ color:var(--yellow); } }
+  .tab.active .tab-ic{
+    background:var(--yellow); border-radius:9px; padding:3px 10px; color:#1a1400;
+    display:flex;
+  }
+  .tab .tab-ic{ display:flex; padding:3px 10px; }
+
+  /* ---------- Tarjetas del carrusel superior: Equipos / EPP ---------- */
+  .car-head{
+    display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
+    position:relative; z-index:1;
+  }
+  .car-title{
+    font-family:"Barlow Condensed", sans-serif; font-size:1.9rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.04em; line-height:1; color:#fff;
+  }
+  .car-sub{ color:#c8d6e4; font-size:.92rem; font-weight:500; margin-top:5px; }
+  .car-pills{ display:flex; gap:8px; flex-wrap:wrap; margin-top:13px; position:relative; z-index:1; }
+  .car-note{ margin-top:11px; font-size:.92rem; font-weight:600; color:#ffb3a7; position:relative; z-index:1; }
+  .car-note.ok{ color:#8fe3ae; }
+  .car-note.neutral{ color:#c8d6e4; font-weight:500; }
+
+  /* ---------- EPP: edición manual, pedidos a SSOMA ---------- */
+  .epp-main{ flex:1; min-width:0; }
+  .stock-edit{ display:flex; gap:8px; align-items:center; margin-top:10px; flex-wrap:wrap; }
+  .stock-edit input{
+    width:84px; padding:9px 10px; font-size:.95rem; font-weight:700; color:var(--text);
+    background:var(--surface-2); border:1.5px solid var(--line); border-radius:9px; outline:none;
+  }
+  .stock-edit label{ font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
+  .btn-save-stock{
+    background:var(--navy); color:#fff; border:none; border-radius:8px; padding:9px 13px; font-weight:700; font-size:.88rem;
+  }
+  @media (prefers-color-scheme: dark){ .btn-save-stock{ background:var(--yellow); color:#1a1400; } }
+  .order-box{ display:block; margin-top:12px; border-top:1px dashed var(--line); padding-top:12px; }
+  .order-hint{ display:block; }
+  .order-row{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .order-row select, .order-row input{
+    padding:9px 10px; font-size:.92rem; color:var(--text);
+    background:var(--surface-2); border:1.5px solid var(--line); border-radius:9px; outline:none;
+  }
+  .order-row input{ width:76px; }
+  .btn-order{
+    background:var(--yellow); color:#1a1400; border:none; border-radius:9px;
+    padding:10px 14px; font-weight:800; font-size:.9rem; box-shadow:0 3px 0 #d99e00;
+  }
+  .btn-order:active{ transform:translateY(2px); box-shadow:0 1px 0 #d99e00; }
+  .order-hint{ font-size:.82rem; color:var(--muted); font-weight:500; margin-top:7px; }
+  .pill.pendiente{ background:var(--amber-bg); color:var(--amber); }
+  .pill.aprobado{ background:var(--green-bg); color:var(--green); }
+  .pill.rechazado{ background:var(--red-bg); color:var(--red); }
+  .pedido-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:15px 16px; margin-bottom:12px;
+  }
+  .pedido-card .top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .pedido-card h3{ font-size:1rem; font-weight:700; }
+  .pedido-card .when{ font-size:.82rem; color:var(--muted); font-weight:600; margin-top:2px; }
+  .pedido-card .det{ font-size:.92rem; margin-top:8px; line-height:1.45; }
+  .pedido-actions{ display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+  .btn-approve{
+    background:var(--green); color:#fff; border:none; border-radius:8px; padding:9px 14px; font-weight:800; font-size:.9rem;
+  }
+  .btn-reject{
+    background:transparent; border:1.5px solid var(--line); color:var(--red); border-radius:8px; padding:9px 14px; font-weight:700; font-size:.9rem;
+  }
+
+  /* ---------- Buscador IPERC en Accidentes ---------- */
+  .search-grid{ display:grid; gap:10px; }
+  .search-results{ margin-top:12px; display:grid; gap:8px; }
+  .search-item{
+    width:100%; text-align:left; background:var(--surface-2); border:1.5px solid var(--line);
+    border-radius:10px; padding:11px 12px; color:var(--text);
+  }
+  .search-item.sel{ border-color:var(--green); background:var(--green-bg); }
+  .search-item strong{ display:block; font-size:.95rem; }
+  .search-item span{ font-size:.84rem; color:var(--muted); font-weight:600; }
+
+  /* ---------- Panel SSOMA ---------- */
+  .ssoma-funcs{ display:grid; gap:9px; margin-bottom:6px; }
+  .ssoma-func{
+    display:flex; gap:11px; align-items:flex-start; background:var(--surface);
+    border:1px solid var(--line); border-radius:var(--radius); padding:13px 14px;
+  }
+  .ssoma-func .n{
+    width:28px; height:28px; border-radius:50%; flex:none; background:var(--navy); color:#fff;
+    font-weight:800; font-size:.88rem; display:flex; align-items:center; justify-content:center;
+  }
+  @media (prefers-color-scheme: dark){ .ssoma-func .n{ background:var(--yellow); color:#1a1400; } }
+  .ssoma-func strong{ display:block; font-size:.96rem; }
+  .ssoma-func p{ color:var(--muted); font-size:.88rem; font-weight:500; margin-top:2px; line-height:1.4; }
+  .insp-row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:10px; }
+  .insp-row select{
+    flex:1; min-width:150px; padding:9px 10px; font-size:.92rem; color:var(--text);
+    background:var(--surface-2); border:1.5px solid var(--line); border-radius:9px; outline:none;
+  }
+
+  /* ---------- Historial SSOMA (desplegable, con búsqueda y filtros) ---------- */
+  .hist-box{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; }
+  .hist-toggle{
+    width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--surface-2); border:none; color:var(--text);
+    padding:14px 15px; text-align:left; cursor:pointer; font:inherit;
+  }
+  .hist-toggle strong{ display:block; font-size:.98rem; }
+  .hist-toggle small{ display:block; color:var(--muted); font-size:.84rem; font-weight:600; margin-top:2px; }
+  .hist-toggle .hist-chev{ width:20px; height:20px; flex:none; color:var(--muted); transition:transform .25s ease; }
+  .hist-box.open .hist-chev{ transform:rotate(180deg); }
+  .hist-body{ display:none; padding:14px; border-top:1px solid var(--line); }
+  .hist-box.open .hist-body{ display:block; }
+  .hist-filters{ display:grid; gap:9px; margin-bottom:13px; }
+  .hist-filters input, .hist-filters select{
+    width:100%; box-sizing:border-box; padding:11px 12px; font-size:.95rem; color:var(--text);
+    background:var(--surface-2); border:1.5px solid var(--line); border-radius:10px; outline:none;
+  }
+  .hist-filters input:focus, .hist-filters select:focus{ border-color:var(--navy-2); box-shadow:0 0 0 3px rgba(255,184,0,.35); }
+  @media (prefers-color-scheme: dark){ .hist-filters input:focus, .hist-filters select:focus{ border-color:var(--yellow); } }
+  .hist-filter-row{ display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+  #hist-list{ display:grid; gap:10px; }
+  #hist-list .pedido-card{ margin-bottom:0; }
+  @media (prefers-reduced-motion: reduce){ .hist-toggle .hist-chev{ transition:none; } }
+
+  @media (prefers-reduced-motion: reduce){
+    .menu-btn:active, .btn-primary:active{ transform:none; }
+    .car-track{ transition:none; }
+  }
+</style>
 </head>
-<body class="bg-zinc-950 text-zinc-100 min-h-full flex flex-col selection:bg-amber-500 selection:text-black">
+<body>
+<div class="phone">
 
-    <header class="relative bg-zinc-900 border-b border-zinc-800 shadow-xl overflow-hidden">
-        <div class="h-2 caution-stripes w-full"></div>
-        
-        <div class="max-w-md mx-auto px-4 py-6 text-center relative z-10">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/10 border-2 border-amber-500/30 text-amber-400 mb-3 shadow-lg shadow-amber-500/10">
-                <i class="fa-solid fa-mountain text-3xl"></i>
-            </div>
-            
-            <h1 class="text-3xl font-black tracking-tight text-white uppercase font-sans drop-shadow-md">
-                GEO <span class="text-amber-400">FLASH</span>
-            </h1>
-            <p class="text-xs text-zinc-400 mt-1 font-semibold">Monitoreo y Alerta Geomecánica Subterránea</p>
-            <div class="mt-2 inline-flex items-center gap-2 bg-zinc-800/80 border border-zinc-700/60 px-4 py-1.5 rounded-full text-sm font-semibold text-amber-300">
-                <span id="connectionDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span id="connectionText">Sistema Conectado</span>
-            </div>
-        </div>
-    </header>
-
-    <div class="max-w-md w-full mx-auto px-4 pt-4">
-        <div class="grid grid-cols-2 gap-2 bg-zinc-900 p-1.5 rounded-2xl border border-zinc-800">
-            <button onclick="switchTab('report')" id="tabReport" class="py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-amber-500 text-zinc-950 transition-all flex items-center justify-center gap-2 shadow">
-                <i class="fa-solid fa-triangle-exclamation"></i> Registrar
-            </button>
-            <button onclick="switchTab('feed')" id="tabFeed" class="py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-zinc-400 hover:text-white transition-all flex items-center justify-center gap-2">
-                <i class="fa-solid fa-tower-broadcast text-emerald-400"></i> Eventos (<span id="badgeCount">0</span>)
-            </button>
-        </div>
+  <!-- ============ PANTALLA 1 · LOGIN ============ -->
+  <section class="screen active" id="screen-login">
+    <div class="login-hero">
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0b2a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1v-2a1 1 0 0 0-.6-.92l-4.07-1.63a2 2 0 0 1-1.11-1.11L15 6H9L7.78 12.34a2 2 0 0 1-1.11 1.11L2.6 15.08A1 1 0 0 0 2 16Z"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><circle cx="7" cy="21" r="1.6" fill="#0b2a4a" stroke="none"/><circle cx="17" cy="21" r="1.6" fill="#0b2a4a" stroke="none"/></svg>
+      </div>
+      <h1>Equipos y<br /><span>Seguridad</span></h1>
+      <p class="sub">CETEMIN · EXPLORACIÓN Y OPERACIÓN MINERA</p>
     </div>
-
-    <main class="flex-1 max-w-md w-full mx-auto px-4 py-4 flex flex-col gap-4">
-        
-        <div id="sectionReport" class="flex flex-col gap-4">
-            <p class="text-xs text-center text-zinc-400 font-medium uppercase tracking-wider mb-1">
-                Selecciona la condición geomecánica crítica
-            </p>
-
-            <!-- Opción 1: Desprendimiento de Roca -->
-            <button onclick="openReportModal('Desprendimiento / Roca Suelta', 'bg-red-600', 'fa-mountain')" 
-                class="group relative w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-5 px-6 rounded-2xl shadow-xl transition-all duration-200 transform active:scale-95 flex items-center justify-between border-2 border-red-400/50">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-black/20 flex items-center justify-center text-2xl text-white group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-mountain"></i>
-                    </div>
-                    <div class="text-left">
-                        <span class="block text-xs uppercase tracking-wider text-red-200 font-semibold">Crítico / Techo o Caja</span>
-                        <span class="text-lg md:text-xl font-black tracking-wide underline decoration-white/40 group-hover:decoration-white">ROCA SUELTA / PLANCHÓN</span>
-                    </div>
-                </div>
-                <i class="fa-solid fa-chevron-right text-red-200 group-hover:translate-x-1 transition-transform"></i>
-            </button>
-
-            <!-- Opción 2: Deformación o Convergencia -->
-            <button onclick="openReportModal('Deformación o Convergencia', 'bg-orange-600', 'fa-arrows-left-right-to-line')" 
-                class="group relative w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold py-5 px-6 rounded-2xl shadow-xl transition-all duration-200 transform active:scale-95 flex items-center justify-between border-2 border-orange-400/50">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-black/20 flex items-center justify-center text-2xl text-white group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-arrows-left-right-to-line"></i>
-                    </div>
-                    <div class="text-left">
-                        <span class="block text-xs uppercase tracking-wider text-orange-200 font-semibold">Sostenimiento / Daño</span>
-                        <span class="text-lg md:text-xl font-black tracking-wide underline decoration-white/40 group-hover:decoration-white">CONVERGENCIA / SHOTCRETE</span>
-                    </div>
-                </div>
-                <i class="fa-solid fa-chevron-right text-orange-200 group-hover:translate-x-1 transition-transform"></i>
-            </button>
-
-            <!-- Opción 3: Filtración de Agua Estructural -->
-            <button onclick="openReportModal('Filtración / Presión de Agua', 'bg-amber-500', 'fa-droplet')" 
-                class="group relative w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-zinc-950 font-black py-5 px-6 rounded-2xl shadow-xl transition-all duration-200 transform active:scale-95 flex items-center justify-between border-2 border-yellow-300/60">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-black/10 flex items-center justify-center text-2xl text-zinc-950 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-droplet"></i>
-                    </div>
-                    <div class="text-left">
-                        <span class="block text-xs uppercase tracking-wider text-zinc-800 font-bold">Hidrogeología</span>
-                        <span class="text-lg md:text-xl font-black tracking-wide underline decoration-zinc-900/40 group-hover:decoration-zinc-900">FILTRACIÓN O PRESIÓN</span>
-                    </div>
-                </div>
-                <i class="fa-solid fa-chevron-right text-zinc-900 group-hover:translate-x-1 transition-transform"></i>
-            </button>
-
-            <div class="mt-2 bg-zinc-900/90 border border-zinc-800/80 rounded-2xl p-4 flex items-center gap-4 shadow-lg">
-                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-2xl animate-bounce">
-                    <i class="fa-solid fa-bolt"></i>
-                </div>
-                <div class="text-xs text-zinc-300 leading-relaxed">
-                    <strong class="text-white block mb-0.5">Modo Subterráneo (PWA Offline):</strong>
-                    Funciona sin internet en mina, guarda los registros con su hora exacta y los sincroniza al volver a superficie.
-                </div>
-                <div class="flex-shrink-0 text-emerald-400 text-2xl">
-                    <i class="fa-brands fa-whatsapp"></i>
-                </div>
-            </div>
+    <div class="stripe" aria-hidden="true"></div>
+    <div class="scroll">
+      <form class="login-card" id="login-form" novalidate>
+        <p class="form-error" id="login-error">Escribe tu correo o usuario y tu contraseña para ingresar.</p>
+        <div class="field">
+          <label for="login-user">Correo o usuario</label>
+          <input type="text" id="login-user" autocomplete="username" placeholder="ejemplo@cetemin.edu.pe" />
         </div>
-
-        <div id="sectionFeed" class="hidden flex flex-col gap-3">
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-2">
-                    <i class="fa-solid fa-satellite-dish text-emerald-400 animate-pulse"></i> Historial Geomecánico
-                </span>
-                <button onclick="shareAppURL()" class="text-xs bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition-colors">
-                    <i class="fa-solid fa-share-nodes"></i> Compartir
-                </button>
-            </div>
-            
-            <div id="cloudFeedList" class="space-y-2.5 max-h-[450px] overflow-y-auto pr-1">
-                <div class="text-center py-10 text-zinc-500 text-xs italic">
-                    <i class="fa-solid fa-spinner fa-spin text-amber-400 text-lg mb-2"></i>
-                    <p>Cargando registros...</p>
-                </div>
-            </div>
+        <div class="field">
+          <label for="login-pass">Contraseña</label>
+          <input type="password" id="login-pass" autocomplete="current-password" placeholder="••••••••" />
         </div>
+        <button type="submit" class="btn-primary">Ingresar</button>
+      </form>
 
-    </main>
-
-    <!-- Botón flotante de Califícanos -->
-    <div class="fixed bottom-4 left-4 z-40">
-        <button onclick="openRateModal()" class="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold px-4 py-2.5 rounded-2xl shadow-xl flex items-center gap-2 text-xs uppercase tracking-wider transition-all transform hover:scale-105 border border-amber-300">
-            <i class="fa-solid fa-hard-hat text-base"></i>
-            <span>Califícanos</span>
+      <div class="demo-box">
+        <h2>Accesos de demostración</h2>
+        <button type="button" class="demo-access" data-user="estudiante@cetemin.edu.pe" data-pass="1234">
+          <span><span class="who">Estudiante</span><span class="cred">estudiante@cetemin.edu.pe · 1234</span></span>
+          <span class="go">Usar</span>
         </button>
+        <button type="button" class="demo-access" data-user="encargado@cetemin.edu.pe" data-pass="1234">
+          <span><span class="who">Encargado</span><span class="cred">encargado@cetemin.edu.pe · 1234</span></span>
+          <span class="go">Usar</span>
+        </button>
+        <button type="button" class="demo-access" data-user="ssoma@cetemin.edu.pe" data-pass="1234">
+          <span><span class="who">SSOMA</span><span class="cred">ssoma@cetemin.edu.pe · 1234</span></span>
+          <span class="go">Usar</span>
+        </button>
+      </div>
+
+      <p class="login-foot">ESTUDIANTES · ENCARGADOS · SSOMA</p>
     </div>
+  </section>
 
-    <footer class="bg-zinc-900 border-t border-zinc-800 py-5 px-4 mt-auto">
-        <div class="max-w-md mx-auto text-center">
-            <a href="https://wa.me/51906109349?text=Hola%20Ingeniero%20Geomecánico,%20necesito%20reportar%20una%20alerta%20en%20labor." target="_blank"
-                class="block bg-zinc-950 hover:bg-zinc-900 border-2 border-amber-500/40 hover:border-amber-400 rounded-2xl p-3.5 transition-all shadow-xl group">
-                <div class="text-[11px] uppercase tracking-widest text-amber-400 font-bold mb-0.5">Geomecánico de Guardia</div>
-                <div class="text-xl font-black text-white tracking-wider flex items-center justify-center gap-2 group-hover:text-amber-300 transition-colors">
-                    <i class="fa-brands fa-whatsapp text-emerald-500"></i>
-                    <span>+51 906 109 349</span>
-                </div>
-            </a>
+  <!-- ============ APP (tras el login) ============ -->
+  <div id="app-shell" style="display:none; flex-direction:column; flex:1;">
+
+    <!-- PANTALLA 2 · PANEL PRINCIPAL -->
+    <section class="screen" id="screen-inicio">
+      <header class="appbar">
+        <div class="brand">
+          <span class="mini" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#0b2a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1v-2a1 1 0 0 0-.6-.92l-4.07-1.63a2 2 0 0 1-1.11-1.11L15 6H9L7.78 12.34a2 2 0 0 1-1.11 1.11L2.6 15.08A1 1 0 0 0 2 16Z"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></span>
+          <span><strong>Equipos y Seguridad</strong><small>CETEMIN</small></span>
         </div>
-    </footer>
-
-    <!-- Modal de Reporte -->
-    <div id="reportModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden transition-opacity opacity-0">
-        <div class="bg-zinc-900 border border-zinc-800 w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl transform translate-y-full sm:translate-y-0 transition-transform duration-300" id="modalContent">
-            
-            <div class="flex items-center justify-between pb-4 border-b border-zinc-800 mb-4">
-                <div class="flex items-center gap-3">
-                    <div id="modalIconBox" class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg">
-                        <i id="modalIcon" class="fa-solid fa-mountain"></i>
-                    </div>
-                    <div>
-                        <span class="text-[10px] uppercase font-bold tracking-wider text-amber-400">Alerta Geomecánica</span>
-                        <h3 id="modalTitle" class="text-lg font-black text-white">Roca Suelta</h3>
-                    </div>
+        <button type="button" class="btn-salir" id="btn-logout">Salir</button>
+      </header>
+      <div class="scroll">
+        <div class="carousel" id="carousel" aria-roledescription="carrusel" aria-label="Panel superior de seguridad">
+          <div class="car-track" id="car-track">
+            <div class="car-slide slide-dias">
+              <p class="lbl">Días sin accidentes</p>
+              <p class="dias-num" id="dias-num">10</p>
+              <p class="since" id="dias-since">Contador del taller y la mina escuela.</p>
+              <button type="button" class="btn-reset" id="btn-reset-open" hidden>Registrar accidente (reiniciar)</button>
+              <div class="reset-confirm" id="reset-confirm">
+                <p>¿Seguro? El contador volverá a <strong>0</strong>. Úsalo solo si ocurrió un accidente.</p>
+                <div class="row">
+                  <button type="button" class="yes" id="btn-reset-yes">Sí, reiniciar</button>
+                  <button type="button" class="no" id="btn-reset-no">Cancelar</button>
                 </div>
-                <button onclick="closeReportModal()" class="w-9 h-9 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white flex items-center justify-center transition-colors">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+              </div>
+              <button type="button" class="btn-acc-link" data-go="accidentes">¿Hubo un accidente? Regístralo aquí →</button>
             </div>
-
-            <form id="reportForm" onsubmit="submitReport(event)" class="space-y-4">
-                <input type="hidden" id="hazardType" value="">
-
-                <!-- UBICACIÓN INTELIGENTE -->
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
-                        <i class="fa-solid fa-location-dot text-amber-400 mr-1"></i> Nivel / Rampa / Labor / Tajos <span class="text-red-500">*</span>
-                    </label>
-                    <div class="relative">
-                        <input type="text" id="hazardLocation" required list="locationsList" placeholder="Selecciona o escribe la labor..."
-                            class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-amber-500 text-sm font-medium">
-                        <datalist id="locationsList">
-                            <option value="Nivel 3200 - Tajos 402">
-                            <option value="Nivel 3400 - Rampa Norte">
-                            <option value="Nivel 3100 - Crucero Principal">
-                            <option value="Nivel 3300 - Tajos 102">
-                            <option value="Bocamina Principal - Sector Sur">
-                            <option value="Subnivel 3250 - Chimenea 4">
-                        </datalist>
-                    </div>
+            <div class="car-slide">
+              <p class="lbl">Accidentes registrados</p>
+              <div class="grav-wrap">
+                <div class="grav-box">
+                  <p class="grav-num leves" id="cnt-leves">0</p>
+                  <p class="grav-lbl">Leves</p>
                 </div>
-
-                <!-- OBSERVACIONES DINÁMICAS SEGÚN EL BOTÓN SELECCIONADO -->
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1.5">
-                        <i class="fa-solid fa-comment-medical text-amber-400 mr-1"></i> Observación / Descripción
-                    </label>
-                    <textarea id="hazardDesc" rows="2" placeholder="Detalles de la labor..."
-                        class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-amber-500 text-sm resize-none mb-2"></textarea>
-                    
-                    <!-- Sugerencias dinámicas que cambian según el tipo de peligro -->
-                    <div id="dynamicSuggestions" class="flex flex-wrap gap-1.5">
-                        <!-- Se llena con JS según el botón -->
-                    </div>
+                <div class="grav-box">
+                  <p class="grav-num graves" id="cnt-graves">0</p>
+                  <p class="grav-lbl">Graves o incapacitantes</p>
                 </div>
-
-                <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 flex items-start gap-3 text-xs text-amber-200">
-                    <i class="fa-solid fa-circle-info text-amber-400 mt-0.5 text-sm"></i>
-                    <div>
-                        Guarda con hora exacta sin internet y abre WhatsApp para notificar al <strong>Geomecánico (+51 906 109 349)</strong>.
-                    </div>
-                </div>
-
-                <div class="pt-2 flex gap-3">
-                    <button type="button" onclick="closeReportModal()" 
-                        class="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold py-3.5 px-4 rounded-xl text-sm transition-colors">
-                        Cancelar
-                    </button>
-                    <button type="submit" 
-                        class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 px-4 rounded-xl text-sm shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2">
-                        <i class="fa-brands fa-whatsapp text-lg"></i>
-                        <span>Enviar Alerta</span>
-                    </button>
-                </div>
-            </form>
+              </div>
+              <p class="since">Cada accidente reportado suma +1 al contador de su gravedad.</p>
+              <button type="button" class="btn-acc-link" data-go="accidentes">Registrar un evento →</button>
+            </div>
+            <div class="car-slide">
+              <div class="car-head">
+                <span><p class="car-title">Equipos</p><p class="car-sub">Maquinaria del taller y la mina escuela, tarjeta independiente.</p></span>
+                <span class="pill op" id="home-eq-pill">—</span>
+              </div>
+              <div class="car-pills" id="home-eq-stats"></div>
+              <p class="car-note neutral" id="home-eq-det"></p>
+              <button type="button" class="btn-acc-link" data-go="equipos">Ver equipos →</button>
+            </div>
+            <div class="car-slide">
+              <div class="car-head">
+                <span><p class="car-title">EPP</p><p class="car-sub">Protección personal: stock, mínimos y pedidos a SSOMA, en su propia tarjeta.</p></span>
+                <span class="pill op" id="home-epp-pill">—</span>
+              </div>
+              <div class="car-pills" id="home-epp-stats"></div>
+              <p class="car-note" id="home-epp-alert"></p>
+              <button type="button" class="btn-acc-link" id="home-epp-btn" data-go="epp">Ver EPP y pedir a SSOMA →</button>
+            </div>
+          </div>
+          <button type="button" class="car-btn prev" id="car-prev" aria-label="Tarjeta anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></button>
+          <button type="button" class="car-btn next" id="car-next" aria-label="Tarjeta siguiente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
+          <div class="car-dots">
+            <button type="button" class="car-dot on" data-car="0" aria-label="Ver días sin accidentes"></button>
+            <button type="button" class="car-dot" data-car="1" aria-label="Ver accidentes por gravedad"></button>
+            <button type="button" class="car-dot" data-car="2" aria-label="Ver tarjeta de Equipos"></button>
+            <button type="button" class="car-dot" data-car="3" aria-label="Ver tarjeta de EPP"></button>
+          </div>
         </div>
+
+        <p class="panel-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span>Panel de información visual para todos: estado de los equipos, EPP y registros de seguridad en un solo lugar.</span>
+        </p>
+
+        <button type="button" class="menu-btn" data-go="equipos">
+          <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#ffb800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4.5 4.5 0 0 0-6 6L3 18l3 3 5.7-5.7a4.5 4.5 0 0 0 6-6L14 13l-3-3 3.7-3.7Z"/></svg></span>
+          <span><h3>Equipos</h3><p>Estado e historial de la maquinaria del taller</p></span>
+          <span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></span>
+        </button>
+
+        <button type="button" class="menu-btn" data-go="epp">
+          <span class="ic yel" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#0b2a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5.2C6.5 6.4 4 9.4 4 13v3H2.5v3h19v-3H20v-3c0-3.6-2.5-6.6-6-7.8V19h-4Z"/><path d="M10 5.2V19M14 5.2V19"/></svg></span>
+          <span><h3>EPP</h3><p>Disponibilidad y renovación de tu protección</p></span>
+          <span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></span>
+        </button>
+
+        <button type="button" class="menu-btn" data-go="iperc">
+          <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#ffb800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg></span>
+          <span><h3>IPERC</h3><p>Registra peligros y riesgos de tu tarea</p></span>
+          <span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></span>
+        </button>
+
+        <button type="button" class="menu-btn" data-go="accidentes">
+          <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#ffb800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5M12 16.5h.01"/><circle cx="12" cy="12" r="9.2"/></svg></span>
+          <span><h3>Accidentes</h3><p>Reporta si ocurrió un accidente o incidente y reinicia el contador</p></span>
+          <span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></span>
+        </button>
+
+        <button type="button" class="menu-btn" data-go="ssoma">
+          <span class="ic yel" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#0b2a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.6-3 8.4-7 10-4-1.6-7-5.4-7-10V6Z"/><path d="m9 12 2 2 4-4"/></svg></span>
+          <span><h3>Panel SSOMA</h3><p>Aprobar pedidos, validar IPERC, acciones correctivas e inspecciones</p></span>
+          <span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></span>
+        </button>
+
+        <div class="user-chip">
+          <span class="avatar" id="user-initial">E</span>
+          <span><small id="user-role">Estudiante</small><strong id="user-email">estudiante@cetemin.edu.pe</strong></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANTALLA 3 · EQUIPOS -->
+    <section class="screen" id="screen-equipos">
+      <div class="scroll">
+        <h2 class="page-title">Equipos</h2>
+        <p class="page-sub">Toca un equipo para ver su información, reportar un cambio de estado y revisar su historial.</p>
+        <div class="eq-summary" id="eq-summary"></div>
+        <div id="eq-list"></div>
+      </div>
+    </section>
+
+    <!-- PANTALLA 4 · DETALLE DE EQUIPO -->
+    <section class="screen" id="screen-detalle">
+      <div class="scroll">
+        <button type="button" class="btn-back" id="btn-back-eq">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+          Volver a Equipos
+        </button>
+        <div class="detail-head">
+          <div>
+            <h2 id="det-nombre">Equipo</h2>
+            <p class="page-sub" style="margin:4px 0 0;" id="det-tipo"></p>
+          </div>
+          <span class="pill op" id="det-pill">Operativo</span>
+        </div>
+
+        <div class="info-card">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg> Información</h3>
+          <div class="info-row"><span class="k">Tipo</span><span class="v" id="det-info-tipo">—</span></div>
+          <div class="info-row"><span class="k">Ubicación</span><span class="v" id="det-ubicacion">—</span></div>
+          <div class="info-row"><span class="k">Estado actual</span><span class="v" id="det-estado">—</span></div>
+          <div class="info-row"><span class="k">Último mantenimiento</span><span class="v" id="det-mant">—</span></div>
+        </div>
+
+        <form class="form-card" id="report-form">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Reportar / Actualizar Estado</h3>
+          <div class="field">
+            <label for="rep-estado">Nuevo estado</label>
+            <select id="rep-estado">
+              <option value="Operativo">Operativo</option>
+              <option value="En mantenimiento">En mantenimiento</option>
+              <option value="Fuera de servicio">Fuera de servicio</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="rep-comentario">Comentario</label>
+            <textarea id="rep-comentario" placeholder="Ej.: Se detectó fuga en manguera hidráulica"></textarea>
+          </div>
+          <button type="submit" class="btn-primary">Guardar reporte</button>
+          <p class="saved-msg" id="report-saved">Reporte guardado. El estado y el historial se actualizaron.</p>
+        </form>
+
+        <div class="hist-card">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg> Historial</h3>
+          <div id="det-historial"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANTALLA 5 · EPP -->
+    <section class="screen" id="screen-epp">
+      <div class="scroll">
+        <h2 class="page-title">EPP</h2>
+        <p class="page-sub">Control de stock de EPP: cantidad disponible, stock mínimo permitido y próxima renovación. Si un ítem baja del mínimo, salta la alerta.</p>
+        <div id="epp-alert"></div>
+        <div id="epp-list"></div>
+
+        <h3 class="section-h">Pedidos y renovaciones a SSOMA</h3>
+        <p class="page-sub" style="margin-bottom:12px;">Cada pedido que envías desde una tarjeta de EPP llega aquí como <strong>Pendiente</strong>. Solo el rol <strong>SSOMA</strong> puede aprobarlo: al aprobar, el estado pasa a <strong>Aprobado</strong> y, si es reposición, el stock se suma automáticamente.</p>
+        <div id="pedidos-list"></div>
+        <p class="saved-msg" id="pedido-saved">Pedido enviado a SSOMA. Quedó en estado Pendiente.</p>
+
+        <div class="steps-card">
+          <h3>¿Cómo renuevo mi EPP?</h3>
+          <ol>
+            <li>En la tarjeta del EPP, elige «Renovación de EPP» y toca «Pedir a SSOMA».</li>
+            <li>SSOMA revisa y autoriza la solicitud en su panel (estado: Aprobado).</li>
+            <li>Entrega el EPP usado o deteriorado y firma el registro de entrega del nuevo.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANTALLA 6 · REGISTRO IPERC -->
+    <section class="screen" id="screen-iperc">
+      <div class="scroll">
+        <h2 class="page-title">Registro IPERC</h2>
+        <p class="page-sub">Formato IPERC continuo: identifica los peligros, califica el riesgo con la matriz y registra los controles.</p>
+
+        <form id="iperc-form" novalidate>
+          <p class="form-error" id="iperc-error">Completa los datos del registro.</p>
+
+          <div class="fsec">
+            <h3>Identificación de peligros, evaluación de riesgos y controles (IPERC)</h3>
+            <div class="fsec-body">
+              <div class="two-col">
+                <div class="field">
+                  <label for="f-sede">Sede</label>
+                  <select id="f-sede">
+                    <option value="ABQ">ABQ</option>
+                    <option value="Otra">Otra</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="f-fecha">Fecha</label>
+                  <input type="date" id="f-fecha" />
+                </div>
+              </div>
+              <div class="field">
+                <label for="f-area">Área</label>
+                <input type="text" id="f-area" placeholder="Ej.: Mina escuela" />
+              </div>
+              <div class="field" style="margin-bottom:0;">
+                <label for="f-actividad">Descripción de la actividad</label>
+                <textarea id="f-actividad" placeholder="Ej.: Perforación en frente (banco)"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="fsec">
+            <h3>Trabajadores / estudiantes que realizarán la actividad</h3>
+            <div class="fsec-body">
+              <div id="workers-box"></div>
+              <button type="button" class="btn-add" id="btn-add-worker">+ Agregar trabajador / estudiante</button>
+            </div>
+          </div>
+
+          <div class="fsec">
+            <h3>Evaluación de riesgos y medidas de control</h3>
+            <div class="fsec-body">
+              <div id="evals-box"></div>
+              <button type="button" class="btn-add" id="btn-add-eval">+ Agregar evaluación</button>
+            </div>
+          </div>
+
+          <div class="fsec">
+            <h3>Secuencia para controlar el peligro y reducir el riesgo</h3>
+            <div class="fsec-body">
+              <div id="seqs-box"></div>
+              <button type="button" class="btn-add" id="btn-add-seq">+ Agregar secuencia</button>
+            </div>
+          </div>
+
+          <div class="fsec">
+            <h3>Verificación de controles por el responsable del trabajo</h3>
+            <div class="fsec-body">
+              <div class="two-col">
+                <div class="field" style="margin-bottom:0;">
+                  <label for="f-hora">Hora (automática)</label>
+                  <input type="text" id="f-hora" class="hora-lock" readonly aria-readonly="true" />
+                  <p class="field-hint">Se captura sola del dispositivo (HH:MM:SS) al abrir el formato y queda bloqueada.</p>
+                </div>
+                <div class="field" style="margin-bottom:0;">
+                  <label for="f-supervisor">Supervisor</label>
+                  <input type="text" id="f-supervisor" placeholder="Nombre del supervisor" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fsec">
+            <h3>Archivos adjuntos</h3>
+            <div class="fsec-body">
+              <label class="adj-zone" for="adj-input">
+                <strong>Sube una imagen de evidencia</strong>
+                <span>Imagen que evidencie la participación de todos los registrados. Toca aquí para seleccionarla.</span>
+              </label>
+              <input type="file" id="adj-input" accept="image/*" hidden />
+              <div id="adj-preview"></div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary">Registrar IPERC</button>
+          <p class="saved-msg" id="iperc-saved">IPERC registrado. Aparece en la lista de registros guardados.</p>
+        </form>
+
+        <h3 class="section-h">Registros IPERC guardados</h3>
+        <div id="iperc-list"></div>
+
+        <div class="ssoma-box">
+          <button type="button" class="btn-ssoma" id="btn-ssoma">Ayuda SSOMA</button>
+          <p class="ssoma-text" id="ssoma-text">Para ayuda con tu IPERC acude al área SSOMA (Seguridad, Salud Ocupacional y Medio Ambiente) o consulta a tu encargado.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANTALLA 7 · ACCIDENTES E INCIDENTES -->
+    <section class="screen" id="screen-accidentes">
+      <div class="scroll">
+        <h2 class="page-title">Accidentes e incidentes</h2>
+        <p class="page-sub">Este es el apartado para rellenar cuando algo ya ocurrió. Aquí queda registrado qué pasó y, si fue accidente, el contador de días sin accidentes vuelve a 0.</p>
+
+        <div class="explain-card">
+          <h3>¿Cómo se sabe si hubo un accidente?</h3>
+          <p>No se sabe solo: <strong>alguien lo reporta</strong>. La persona afectada, un compañero que lo vio o el encargado avisa a SSOMA y rellena este formato el mismo día. Sin reporte, el contador sigue subiendo aunque haya pasado algo.</p>
+          <div class="diff-box">
+            <span class="tag antes">Antes · IPERC</span>
+            <p><strong>El IPERC es preventivo.</strong> Se llena <em>antes</em> de la tarea para identificar peligros y poner controles. No registra accidentes y no reinicia el contador.</p>
+          </div>
+          <div class="diff-box">
+            <span class="tag despues">Después · Este registro</span>
+            <p><strong>El registro de accidentes es correctivo.</strong> Se llena <em>después</em> de que ocurrió el hecho. Si fue accidente, reinicia el contador a 0. Luego se revisa el IPERC: ¿ese peligro estaba identificado? ¿falló el control? Así el IPERC se corrige para que no se repita.</p>
+          </div>
+          <p style="margin-top:10px;"><strong>Incidente / casi accidente:</strong> algo peligroso pasó pero nadie salió lesionado (ej.: cayó una roca sin golpear a nadie). También se registra aquí, pero <strong>no reinicia el contador</strong>.</p>
+        </div>
+
+        <div class="acc-stats" aria-label="Contadores de accidentes por gravedad">
+          <div class="acc-stat"><span class="n" id="acc-stat-leves">0</span><span class="t">Accidentes leves</span></div>
+          <div class="acc-stat"><span class="n grave" id="acc-stat-graves">0</span><span class="t">Graves o incapacitantes</span></div>
+        </div>
+
+        <form id="accidente-form" novalidate>
+          <p class="form-error" id="accidente-error">Completa los datos del reporte.</p>
+
+          <div class="fsec">
+            <h3>Buscar y seleccionar un IPERC registrado</h3>
+            <div class="fsec-body">
+              <p class="field-hint" style="margin:0 0 12px;">Busca dentro de los IPERC ya registrados y toca uno para seleccionarlo: quedará vinculado a este reporte. Filtra por <strong>nombre de trabajo / actividad</strong> o por <strong>fecha</strong>.</p>
+              <div class="search-grid">
+                <div class="field" style="margin-bottom:0;">
+                  <label for="a-buscar-texto">Nombre de trabajo / actividad</label>
+                  <input type="text" id="a-buscar-texto" placeholder="Ej.: Perforación en frente" />
+                </div>
+                <div class="field" style="margin-bottom:0;">
+                  <label for="a-buscar-fecha">Fecha del IPERC</label>
+                  <input type="date" id="a-buscar-fecha" />
+                </div>
+              </div>
+              <div class="order-row" style="margin-top:12px;">
+                <button type="button" class="btn-save-stock" id="btn-buscar-iperc">Buscar IPERC</button>
+                <button type="button" class="btn-mini" id="btn-limpiar-busqueda">Limpiar filtros</button>
+              </div>
+              <div class="search-results" id="a-iperc-results"></div>
+              <p class="field-hint" id="a-iperc-sel-note" style="margin-top:10px;">Sin selección manual: se vinculará automáticamente el IPERC del lugar elegido, como hasta ahora.</p>
+            </div>
+          </div>
+
+          <div class="fsec">
+            <h3>Reporte de accidente / incidente</h3>
+            <div class="fsec-body">
+              <div class="two-col">
+                <div class="field">
+                  <label for="a-fecha">Fecha</label>
+                  <input type="date" id="a-fecha" />
+                </div>
+                <div class="field">
+                  <label for="a-hora">Hora (automática)</label>
+                  <input type="text" id="a-hora" class="hora-lock" readonly aria-readonly="true" />
+                  <p class="field-hint">Se captura sola del dispositivo (HH:MM:SS) al abrir el formato y queda bloqueada.</p>
+                </div>
+              </div>
+              <div class="two-col">
+                <div class="field">
+                  <label for="a-lugar">Lugar</label>
+                  <select id="a-lugar">
+                    <option value="Mina escuela">Mina escuela</option>
+                    <option value="Taller CETEMIN">Taller CETEMIN</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="a-tipo">Tipo de evento</label>
+                  <select id="a-tipo">
+                    <option value="Accidente con lesión">Accidente con lesión</option>
+                    <option value="Accidente solo con daño material">Accidente solo con daño material</option>
+                    <option value="Incidente / casi accidente">Incidente / casi accidente (sin lesión)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="link-box ok" id="a-iperc-box"></div>
+              <input type="file" id="a-iperc-file" accept="image/*,.pdf" hidden />
+              <div class="two-col">
+                <div class="field">
+                  <label for="a-gravedad">Gravedad</label>
+                  <select id="a-gravedad">
+                    <option value="Leve">Leve</option>
+                    <option value="Grave / incapacitante">Grave / incapacitante</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="a-equipo">Equipo involucrado</label>
+                  <select id="a-equipo">
+                    <option value="Ninguno">Ninguno</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label for="a-afectado">Persona afectada (si hubo)</label>
+                <input type="text" id="a-afectado" placeholder="Nombre y apellidos · Déjalo vacío si nadie salió afectado" />
+              </div>
+              <div class="field">
+                <label for="a-descripcion">¿Qué ocurrió? *</label>
+                <textarea id="a-descripcion" placeholder="Ej.: Durante la perforación cayó una roca del frente y golpeó el pie del perforista"></textarea>
+              </div>
+              <div class="field">
+                <label for="a-peligro">Peligro relacionado (del IPERC)</label>
+                <input type="text" id="a-peligro" placeholder="Ej.: Roca suelta / inestable en el frente" />
+              </div>
+              <div class="field" style="margin-bottom:0;">
+                <label for="a-accion">Acción inmediata que se tomó</label>
+                <textarea id="a-accion" placeholder="Ej.: Se detuvo la tarea, se brindó primeros auxilios y se avisó a SSOMA y al encargado"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary">Registrar evento</button>
+          <p class="saved-msg" id="accidente-saved">Evento registrado.</p>
+          <p class="panel-note" style="margin:12px 2px 0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <span>Si el tipo es <strong>Accidente</strong>, al guardar el contador vuelve a 0 automáticamente. Si es <strong>incidente / casi accidente</strong>, queda registrado pero el contador no se reinicia.</span>
+          </p>
+        </form>
+
+        <h3 class="section-h">Historial de accidentes e incidentes</h3>
+        <div id="accidentes-list"></div>
+      </div>
+    </section>
+
+    <!-- PANTALLA 8 · PANEL SSOMA -->
+    <section class="screen" id="screen-ssoma">
+      <div class="scroll">
+        <h2 class="page-title">Panel SSOMA</h2>
+        <p class="page-sub">Seguridad, Salud Ocupacional y Medio Ambiente. Desde aquí SSOMA supervisa la seguridad del taller y la mina escuela.</p>
+
+        <h3 class="section-h" style="margin-top:0;">Funciones de SSOMA</h3>
+        <div class="ssoma-funcs">
+          <div class="ssoma-func"><span class="n">1</span><span><strong>Validación y supervisión de reportes IPERC</strong><p>Revisa cada IPERC presentado, lo valida o lo deja observado para corrección.</p></span></div>
+          <div class="ssoma-func"><span class="n">2</span><span><strong>Seguimiento de acciones correctivas</strong><p>Verifica que los controles y medidas correctivas de cada IPERC se cumplan y marca su verificación.</p></span></div>
+          <div class="ssoma-func"><span class="n">3</span><span><strong>Gestión de inspecciones de maquinaria</strong><p>Actualiza el estado de inspección de cada equipo: operativo, en mantenimiento o fuera de servicio.</p></span></div>
+          <div class="ssoma-func"><span class="n">4</span><span><strong>Autorización de pedidos y renovaciones de EPP</strong><p>Aprueba o rechaza las solicitudes de reposición de stock y de renovación de EPP. Al aprobar, el estado pasa a «Aprobado».</p></span></div>
+        </div>
+        <p class="saved-msg" id="ssoma-saved">Cambios guardados.</p>
+        <p class="panel-note" id="ssoma-lock-note" style="display:none; margin:12px 2px 0;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span>Estás viendo el panel en modo consulta. Para aprobar pedidos, validar IPERC o cambiar estados, ingresa con el rol <strong>SSOMA</strong> (ssoma@cetemin.edu.pe).</span>
+        </p>
+
+        <h3 class="section-h">Solicitudes por aprobar</h3>
+        <div id="ssoma-pedidos"></div>
+
+        <h3 class="section-h">Validación de IPERC y acciones correctivas</h3>
+        <div id="ssoma-iperc"></div>
+
+        <h3 class="section-h">Inspecciones de maquinaria</h3>
+        <div id="ssoma-equipos"></div>
+
+        <h3 class="section-h">Historial</h3>
+        <div class="hist-box" id="ssoma-historial">
+          <button type="button" class="hist-toggle" id="hist-toggle" aria-expanded="false" aria-controls="hist-body">
+            <span><strong>Historial de resueltos</strong><small id="hist-count">0 resueltos · Toca para desplegar</small></span>
+            <svg class="hist-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="hist-body" id="hist-body">
+            <div class="hist-filters">
+              <input type="text" id="hist-q" placeholder="Buscar por EPP, trabajo, área o solicitante…" aria-label="Buscar en el historial" />
+              <div class="hist-filter-row">
+                <select id="hist-tipo" aria-label="Filtrar por tipo">
+                  <option value="todos">Tipo: Todos</option>
+                  <option value="pedido">Pedidos de EPP</option>
+                  <option value="iperc">IPERC</option>
+                  <option value="equipo">Inspecciones de maquinaria</option>
+                </select>
+                <select id="hist-estado" aria-label="Filtrar por estado">
+                  <option value="todos">Estado: Todos</option>
+                  <option value="Aprobado">Aprobado</option>
+                  <option value="Rechazado">Rechazado</option>
+                  <option value="Validado">Validado</option>
+                  <option value="Operativo">Operativo</option>
+                </select>
+              </div>
+            </div>
+            <div id="hist-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Barra inferior -->
+  <nav class="tabbar" id="tabbar" aria-label="Navegación principal">
+    <button type="button" class="tab" data-go="inicio">
+      <span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1Z"/></svg></span>
+      Inicio
+    </button>
+    <button type="button" class="tab" data-go="equipos">
+      <span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4.5 4.5 0 0 0-6 6L3 18l3 3 5.7-5.7a4.5 4.5 0 0 0 6-6L14 13l-3-3 3.7-3.7Z"/></svg></span>
+      Equipos
+    </button>
+    <button type="button" class="tab" data-go="epp">
+      <span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5.2C6.5 6.4 4 9.4 4 13v3H2.5v3h19v-3H20v-3c0-3.6-2.5-6.6-6-7.8V19h-4Z"/><path d="M10 5.2V19M14 5.2V19"/></svg></span>
+      EPP
+    </button>
+    <button type="button" class="tab" data-go="iperc">
+      <span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg></span>
+      IPERC
+    </button>
+    <button type="button" class="tab" data-go="accidentes">
+      <span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.2"/><path d="M12 8v5M12 16.5h.01"/></svg></span>
+      Accidentes
+    </button>
+  </nav>
+
+  <!-- Modal · Matriz de evaluación -->
+  <div class="modal-overlay" id="matriz-modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="matriz-title">
+      <div class="modal-head">
+        <h3 id="matriz-title">Matriz de evaluación</h3>
+        <button type="button" class="modal-close" id="matriz-close" aria-label="Cerrar matriz">&times;</button>
+      </div>
+      <p class="modal-sub" id="matriz-title-sub">Selecciona una frecuencia</p>
+      <p class="modal-hint">Filas: severidad · Columnas: frecuencia. Toca una celda y esa será la calificación.</p>
+      <div id="matriz-grid"></div>
+      <div class="legend">
+        <div class="legend-item">
+          <span class="legend-badge alto">ALTO</span>
+          <span>Riesgo intolerable, requiere controles inmediatos. Si no se puede controlar el PELIGRO se paralizan los trabajos operacionales en la labor.</span>
+          <span class="legend-plazo">Plazo de medida correctiva: 0-24 HORAS</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-badge medio">MEDIO</span>
+          <span>Iniciar medidas para eliminar/reducir el riesgo. Evaluar si la acción se puede ejecutar de manera inmediata.</span>
+          <span class="legend-plazo">Plazo de medida correctiva: 0-72 HORAS</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-badge bajo">BAJO</span>
+          <span>Este riesgo puede ser tolerable.</span>
+          <span class="legend-plazo">Plazo de medida correctiva: 1 MES</span>
+        </div>
+      </div>
     </div>
+  </div>
+</div>
 
-    <!-- Modal de Compartir App -->
-    <div id="shareModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-zinc-900 border border-zinc-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center">
-            <div class="w-14 h-14 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center text-amber-400 text-2xl mx-auto mb-3">
-                <i class="fa-solid fa-share-nodes"></i>
-            </div>
-            <h3 class="text-lg font-black text-white mb-1">Compartir GeoFlash</h3>
-            <p class="text-xs text-zinc-400 mb-4">Enlace directo para el equipo de operaciones y geomecánica.</p>
-            
-            <div class="bg-zinc-950 border border-zinc-800 p-3 rounded-xl mb-4 text-xs font-mono text-amber-300 break-all select-all" id="shareUrlText">
-                Cargando enlace...
-            </div>
+<script>
+(function(){
+  "use strict";
 
-            <div class="flex gap-2">
-                <button onclick="copyShareUrl()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold py-3 rounded-xl text-xs transition-colors flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-copy"></i> Copiar
-                </button>
-                <button onclick="closeShareModal()" class="px-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold py-3 rounded-xl text-xs transition-colors">
-                    Cerrar
-                </button>
-            </div>
-        </div>
-    </div>
+  /* ---------- Datos iniciales ---------- */
+  var EQUIPOS_SEED = [
+    { id:"boomer281", nombre:"Jumbo Boomer 281", tipo:"Perforación frontal", ubicacion:"Taller CETEMIN", estado:"En mantenimiento", ultimoMant:"12 oct 2026",
+      historial:[
+        { fecha:"20 oct 2026, 09:15", estado:"En mantenimiento", comentario:"Ingreso a taller por revisión del brazo de perforación." },
+        { fecha:"17 oct 2026, 16:40", estado:"Operativo", comentario:"Práctica de perforación frontal sin observaciones." },
+        { fecha:"10 oct 2026, 08:05", estado:"Operativo", comentario:"Inspección pre-uso aprobada." }
+      ]},
+    { id:"simba", nombre:"Simba H157", tipo:"Perforación vertical", ubicacion:"Mina escuela", estado:"Operativo", ultimoMant:"05 oct 2026",
+      historial:[
+        { fecha:"19 oct 2026, 11:20", estado:"Operativo", comentario:"Perforación de taladros largos completada." },
+        { fecha:"05 oct 2026, 15:30", estado:"En mantenimiento", comentario:"Mantenimiento programado de 250 horas." }
+      ]},
+    { id:"sandvik", nombre:"Jumbo Sandvik DD321", tipo:"Perforación frontal", ubicacion:"Mina escuela", estado:"Operativo", ultimoMant:"28 sep 2026",
+      historial:[
+        { fecha:"18 oct 2026, 10:00", estado:"Operativo", comentario:"Cambio de brocas y revisión de centralizadores." },
+        { fecha:"11 oct 2026, 13:45", estado:"Operativo", comentario:"Práctica con grupo de estudiantes sin incidentes." }
+      ]},
+    { id:"camion793", nombre:"Camión minero 793F", tipo:"Acarreo de mineral", ubicacion:"Taller CETEMIN", estado:"Operativo", ultimoMant:"02 oct 2026",
+      historial:[
+        { fecha:"20 oct 2026, 07:50", estado:"Operativo", comentario:"Revisión de frenos y dirección aprobada." },
+        { fecha:"02 oct 2026, 17:10", estado:"En mantenimiento", comentario:"Cambio de aceite y filtros del motor." }
+      ]},
+    { id:"pala6040", nombre:"Pala hidráulica 6040", tipo:"Carguío y excavación", ubicacion:"Mina escuela", estado:"Operativo", ultimoMant:"21 sep 2026",
+      historial:[
+        { fecha:"16 oct 2026, 09:35", estado:"Operativo", comentario:"Revisión de dientes del cucharón: completos." },
+        { fecha:"09 oct 2026, 14:25", estado:"Operativo", comentario:"Engrase general del tren de rodamiento." }
+      ]},
+    { id:"scoop", nombre:"Scoop R1600", tipo:"Carguío subterráneo", ubicacion:"Taller CETEMIN", estado:"Fuera de servicio", ultimoMant:"25 sep 2026",
+      historial:[
+        { fecha:"19 oct 2026, 08:10", estado:"Fuera de servicio", comentario:"Falla en el sistema hidráulico; en espera de repuesto." },
+        { fecha:"14 oct 2026, 12:00", estado:"En mantenimiento", comentario:"Diagnóstico de bomba hidráulica." },
+        { fecha:"08 oct 2026, 09:00", estado:"Operativo", comentario:"Acarreo en rampa principal sin observaciones." }
+      ]}
+  ];
 
-    <!-- Modal de Califícanos -->
-    <div id="rateModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity opacity-0">
-        <div class="bg-zinc-900 border border-zinc-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center transform scale-95 transition-transform duration-300" id="rateModalContent">
-            <div class="w-14 h-14 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center text-amber-400 text-2xl mx-auto mb-3">
-                <i class="fa-solid fa-hard-hat"></i>
-            </div>
-            <h3 class="text-lg font-black text-white mb-1">Califícanos</h3>
-            <p class="text-xs text-zinc-400 mb-4">¿Qué tan útil es esta herramienta para el control geomecánico?</p>
-            
-            <div id="hatRatingContainer" class="flex justify-center gap-3 mb-6 text-3xl cursor-pointer text-zinc-600">
-                <i class="fa-solid fa-hard-hat transition-colors hover:text-amber-400" data-value="1"></i>
-                <i class="fa-solid fa-hard-hat transition-colors hover:text-amber-400" data-value="2"></i>
-                <i class="fa-solid fa-hard-hat transition-colors hover:text-amber-400" data-value="3"></i>
-                <i class="fa-solid fa-hard-hat transition-colors hover:text-amber-400" data-value="4"></i>
-                <i class="fa-solid fa-hard-hat transition-colors hover:text-amber-400" data-value="5"></i>
-            </div>
+  var EPP_DATA = [
+    { nombre:"Casco de seguridad", estado:"Disponible", det:"Renovación: marzo 2027", icon:"casco", stock:24, min:10 },
+    { nombre:"Lentes de seguridad", estado:"Disponible", det:"Renovación: al presentar rayaduras", icon:"lentes", stock:40, min:15 },
+    { nombre:"Guantes", estado:"Disponible", det:"Renovación: mensual o por desgaste", icon:"guantes", stock:8, min:20 },
+    { nombre:"Respirador con filtros", estado:"Por renovar", det:"Filtros vencen: noviembre 2026 · Acude a SSOMA", icon:"respirador", stock:12, min:10 },
+    { nombre:"Botas con punta de acero", estado:"Disponible", det:"Renovación: anual · Tallas en almacén", icon:"botas", stock:18, min:8 },
+    { nombre:"Arnés de seguridad", estado:"Por renovar", det:"Inspección vence: noviembre 2026 · No usar vencido", icon:"arnes", stock:6, min:5 },
+    { nombre:"Protección auditiva", estado:"Sin stock", det:"Tapones y orejeras agotados · Pedido en camino", icon:"auditiva", stock:0, min:12 }
+  ];
 
-            <div class="flex gap-2">
-                <button onclick="submitRating()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold py-3 rounded-xl text-xs transition-colors shadow-lg shadow-amber-500/20">
-                    Enviar Calificación
-                </button>
-                <button onclick="closeRateModal()" class="px-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold py-3 rounded-xl text-xs transition-colors">
-                    Cerrar
-                </button>
-            </div>
-        </div>
-    </div>
+  var ICONS = {
+    casco:'<svg viewBox="0 0 24 24" fill="none" stroke="#0b2a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5.2C6.5 6.4 4 9.4 4 13v3H2.5v3h19v-3H20v-3c0-3.6-2.5-6.6-6-7.8V19h-4Z"/><path d="M10 5.2V19M14 5.2V19"/></svg>',
+    lentes:'<svg viewBox="0 0 24 24" fill="none" stroke="#0b2a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9h20"/><path d="M3 9v3a3 3 0 0 0 3 3h1a3 3 0 0 0 3-3V9M14 9v3a3 3 0 0 0 3 3h1a3 3 0 0 0 3-3V9"/><path d="M10 11h4"/></svg>',
+    guantes:'<svg viewBox="0 0 24 24" fill="none" stroke="#0b2a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11V5.5a1.5 1.5 0 0 1 3 0V10m0-5.5v-1a1.5 1.5 0 0 1 3 0V10m0-5a1.5 1.5 0 0 1 3 0v6m0-4a1.5 1.5 0 0 1 3 0v5a7 7 0 0 1-7 7h-1c-2.5 0-4-1-5.2-3.2L4.6 13a1.6 1.6 0 0 1 2.6-1.8L8 12"/></svg>',
+    respirador:'<svg viewBox="0 0 24 24" fill="none" stroke="#0b2a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10a8 6 0 0 1 16 0v3a5 5 0 0 1-5 5h-6a5 5 0 0 1-5-5Z"/><path d="M9 14h6M4 10 2 7m18 3 2-3"/></svg>',
+    botas:'<svg viewBox="0 0 24 24" fill="none" stroke="#0b2a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h7v9l6 3a3 3 0 0 1 2 2.7V20H4Z"/><path d="M4 20h16M11 7H7"/></svg>',
+    arnes:'<svg viewBox="0 0 24 24" fill="none" stroke="#0b2a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v8l5 4 5-4V3"/><path d="M7 21v-5m10 5v-5"/><circle cx="12" cy="11" r="1.6"/></svg>',
+    auditiva:'<svg viewBox="0 0 24 24" fill="none" stroke="#0b2a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15v-2a8 8 0 0 1 16 0v2"/><rect x="2.5" y="14" width="4.5" height="7" rx="2"/><rect x="17" y="14" width="4.5" height="7" rx="2"/></svg>'
+  };
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  /* ---------- Almacenamiento ---------- */
+  function loadJSON(key, fallback){
+    try{
+      var raw = localStorage.getItem(key);
+      if(!raw) return JSON.parse(JSON.stringify(fallback));
+      var parsed = JSON.parse(raw);
+      return parsed == null ? JSON.parse(JSON.stringify(fallback)) : parsed;
+    }catch(e){ return JSON.parse(JSON.stringify(fallback)); }
+  }
+  function saveJSON(key, value){
+    try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
+  }
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAQDfMVfnVsR5LCR-PkRPE0QWe2dMQ8gHc",
-            authDomain: "reporte-fla.firebaseapp.com",
-            projectId: "reporte-fla",
-            storageBucket: "reporte-fla.firebasestorage.app",
-            messagingSenderId: "673783183660",
-            appId: "1:673783183660:web:ff5f0ab192d5a92a64d489",
-            measurementId: "G-6MQPMYNCP1"
-        };
+  var equipos = loadJSON("cetemin_equipos_v1", EQUIPOS_SEED);
+  var iperc = loadJSON("cetemin_iperc_v2", null);
+  var accidentes = loadJSON("cetemin_accidentes_v1", []);
+  var diasData = loadJSON("cetemin_dias_v1", { dias: 10, desde: null });
+  var stockData = loadJSON("cetemin_stock_v1", {});
+  var PEDIDOS_SEED = [
+    { id: "ped-semilla-1", epp: "Guantes", tipo: "Reposición de stock", cantidad: 20, solicitante: "encargado@cetemin.edu.pe", fecha: "21 oct 2026, 09:00", estado: "Pendiente" }
+  ];
+  var pedidos = loadJSON("cetemin_pedidos_v1", PEDIDOS_SEED);
 
-        const appId = 'geoflash-mineria';
-        let db, auth, currentUser = null;
-        let reportsCache = [];
-        let selectedRating = 0;
+  /* ---------- Utilidades ---------- */
+  function $(id){ return document.getElementById(id); }
+  function esc(s){
+    return String(s == null ? "" : s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+  }
+  function estadoClass(estado){
+    if(estado === "Operativo") return "op";
+    if(estado === "En mantenimiento") return "mant";
+    return "fuera";
+  }
+  function eppClass(estado){
+    if(estado === "Disponible") return "op";
+    if(estado === "Por renovar") return "renovar";
+    return "fuera";
+  }
+  function califClass(nivel){
+    if(nivel === "Bajo") return "op";
+    if(nivel === "Medio") return "mant";
+    if(nivel === "Alto") return "renovar";
+    return "fuera";
+  }
+  function ahoraTexto(){
+    var d = new Date();
+    var meses = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+    function pad(n){ return (n<10?"0":"")+n; }
+    return d.getDate() + " " + meses[d.getMonth()] + " " + d.getFullYear() + ", " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+  }
+  function horaHMS(){
+    var d = new Date();
+    function p(n){ return (n < 10 ? "0" : "") + n; }
+    return p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds());
+  }
 
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                const swCode = `
-                    self.addEventListener('install', (e) => e.waitUntil(self.skipWaiting()));
-                    self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
-                    self.addEventListener('fetch', (e) => {
-                        e.respondWith(
-                            fetch(e.request).catch(() => caches.match(e.request))
-                        );
-                    });
-                `;
-                const blob = new Blob([swCode], { type: 'text/javascript' });
-                const swUrl = URL.createObjectURL(blob);
-                navigator.serviceWorker.register(swUrl).catch(err => console.log("SW error", err));
-            });
-        }
+  /* ---------- Sesión ---------- */
+  var session = null;
+  try{ session = JSON.parse(sessionStorage.getItem("cetemin_sesion") || "null"); }catch(e){ session = null; }
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            loadOfflineReports();
-            checkOnlineStatus();
+  var currentScreen = "inicio";
+  var currentEquipoId = null;
+  var califSeleccionada = null;
 
-            window.addEventListener('online', () => {
-                checkOnlineStatus();
-                syncOfflineReports();
-            });
-            window.addEventListener('offline', checkOnlineStatus);
+  function showScreen(name){
+    currentScreen = name;
+    var ids = { inicio:"screen-inicio", equipos:"screen-equipos", detalle:"screen-detalle", epp:"screen-epp", iperc:"screen-iperc", accidentes:"screen-accidentes", ssoma:"screen-ssoma" };
+    Object.keys(ids).forEach(function(k){
+      $(ids[k]).classList.toggle("active", k === name);
+    });
+    var tabs = document.querySelectorAll(".tabbar .tab");
+    tabs.forEach(function(t){
+      var go = t.getAttribute("data-go");
+      t.classList.toggle("active", go === name || (name === "detalle" && go === "equipos"));
+    });
+    var active = document.querySelector("#" + ids[name] + " .scroll");
+    if(active) active.scrollTop = 0;
+    if(name === "iperc" && $("f-hora")) $("f-hora").value = horaHMS();
+    if(name === "accidentes"){
+      if($("a-hora")) $("a-hora").value = horaHMS();
+      actualizarVinculoIperc();
+      renderBusquedaIperc();
+    }
+    if(name === "ssoma") renderSSOMA();
+    if(name === "epp") renderPedidos();
+  }
 
-            try {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                await signInAnonymously(auth);
-                currentUser = auth.currentUser;
-                initCloudSync();
-                syncOfflineReports();
-            } catch (err) {
-                console.warn("Modo Offline Activo");
-            }
+  function enterApp(){
+    $("screen-login").classList.remove("active");
+    $("screen-login").style.display = "none";
+    $("app-shell").style.display = "flex";
+    $("tabbar").classList.add("show");
+    $("user-email").textContent = session.email;
+    $("user-role").textContent = session.rol === "encargado" ? "Encargado" : (session.rol === "ssoma" ? "SSOMA" : "Estudiante");
+    $("user-initial").textContent = (session.email.charAt(0) || "U").toUpperCase();
+    $("btn-reset-open").hidden = !(session.rol === "encargado" || session.rol === "ssoma");
+    /* El rol SSOMA entra directo a su chamba: en Inicio solo ve su Panel SSOMA,
+       sin las tarjetas de menú de Equipos, EPP, IPERC y Accidentes. */
+    document.querySelectorAll(".menu-btn[data-go]").forEach(function(b){
+      var g = b.getAttribute("data-go");
+      b.style.display = (session.rol === "ssoma" && g !== "ssoma") ? "none" : "";
+    });
+    /* SSOMA no se pide a sí mismo: su botón del carrusel solo dice «Ver EPP». */
+    var eppBtn = $("home-epp-btn");
+    if(eppBtn) eppBtn.textContent = session.rol === "ssoma" ? "Ver EPP →" : "Ver EPP y pedir a SSOMA →";
+    renderDias();
+    renderEquipos();
+    renderEPP();
+    renderPedidos();
+    renderIperc();
+    renderAccidentes();
+    renderHomeCards();
+    showScreen("inicio");
+    carGo(0);
+  }
 
-            setupRatingSystem();
+  function exitApp(){
+    try{ sessionStorage.removeItem("cetemin_sesion"); }catch(e){}
+    session = null;
+    $("app-shell").style.display = "none";
+    $("tabbar").classList.remove("show");
+    $("screen-login").style.display = "";
+    $("screen-login").classList.add("active");
+  }
+
+  /* ---------- Login ---------- */
+  $("login-form").addEventListener("submit", function(ev){
+    ev.preventDefault();
+    var user = $("login-user").value.trim();
+    var pass = $("login-pass").value;
+    if(!user || !pass.trim()){
+      $("login-error").classList.add("show");
+      return;
+    }
+    $("login-error").classList.remove("show");
+    var uLow = user.toLowerCase();
+    var rol = uLow.indexOf("ssoma") === 0 ? "ssoma" : (uLow.indexOf("encargado") === 0 ? "encargado" : "estudiante");
+    session = { email: user, rol: rol };
+    try{ sessionStorage.setItem("cetemin_sesion", JSON.stringify(session)); }catch(e){}
+    enterApp();
+  });
+  document.querySelectorAll(".demo-access").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      $("login-user").value = btn.getAttribute("data-user");
+      $("login-pass").value = btn.getAttribute("data-pass");
+      $("login-error").classList.remove("show");
+      $("login-pass").focus();
+    });
+  });
+  $("btn-logout").addEventListener("click", exitApp);
+
+  /* ---------- Navegación ---------- */
+  document.querySelectorAll("[data-go]").forEach(function(el){
+    el.addEventListener("click", function(){ showScreen(el.getAttribute("data-go")); });
+  });
+  $("btn-back-eq").addEventListener("click", function(){ showScreen("equipos"); });
+
+  /* ---------- Días sin accidentes ---------- */
+  function renderDias(){
+    $("dias-num").textContent = diasData.dias;
+    $("dias-since").textContent = diasData.desde
+      ? "Reiniciado el " + diasData.desde + " · Contador del taller y la mina escuela."
+      : "Contador del taller y la mina escuela.";
+    $("reset-confirm").classList.remove("show");
+  }
+  $("btn-reset-open").addEventListener("click", function(){
+    $("reset-confirm").classList.add("show");
+  });
+  $("btn-reset-no").addEventListener("click", function(){
+    $("reset-confirm").classList.remove("show");
+  });
+  $("btn-reset-yes").addEventListener("click", function(){
+    diasData = { dias: 0, desde: ahoraTexto() };
+    saveJSON("cetemin_dias_v1", diasData);
+    renderDias();
+  });
+
+  /* ---------- Carrusel superior (rotación 30 s, botones y swipe) ---------- */
+  var carIdx = 0;
+  var carTimer = null;
+  function carGo(i){
+    var track = $("car-track");
+    if(!track) return;
+    var total = track.children.length || 1;
+    carIdx = ((i % total) + total) % total;
+    track.style.transform = "translateX(-" + (carIdx * 100) + "%)";
+    document.querySelectorAll(".car-dot").forEach(function(d, di){
+      d.classList.toggle("on", di === carIdx);
+    });
+    carRestart();
+  }
+  function carRestart(){
+    if(carTimer){ clearInterval(carTimer); carTimer = null; }
+    if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    carTimer = setInterval(function(){
+      if(session && currentScreen === "inicio") carGo(carIdx + 1);
+    }, 30000);
+  }
+  $("car-prev").addEventListener("click", function(){ carGo(carIdx - 1); });
+  $("car-next").addEventListener("click", function(){ carGo(carIdx + 1); });
+  document.querySelectorAll(".car-dot").forEach(function(d){
+    d.addEventListener("click", function(){ carGo(parseInt(d.getAttribute("data-car"), 10)); });
+  });
+  var carTouchX = null;
+  $("carousel").addEventListener("touchstart", function(e){
+    carTouchX = e.changedTouches[0].clientX;
+  }, { passive: true });
+  $("carousel").addEventListener("touchend", function(e){
+    if(carTouchX === null) return;
+    var dx = e.changedTouches[0].clientX - carTouchX;
+    if(Math.abs(dx) > 40) carGo(carIdx + (dx < 0 ? 1 : -1));
+    carTouchX = null;
+  }, { passive: true });
+
+  /* ---------- Equipos ---------- */
+  function renderEquipos(){
+    var op = 0, mant = 0, fuera = 0;
+    equipos.forEach(function(e2){
+      if(e2.estado === "Operativo") op++;
+      else if(e2.estado === "En mantenimiento") mant++;
+      else fuera++;
+    });
+    var sum = $("eq-summary");
+    if(sum){
+      sum.innerHTML = '<span class="pill op">' + op + ' operativos</span>'
+        + '<span class="pill mant">' + mant + ' en mantenimiento</span>'
+        + '<span class="pill fuera">' + fuera + ' fuera de servicio</span>';
+    }
+    var html = "";
+    equipos.forEach(function(eq){
+      html += '<button type="button" class="eq-card" data-eq="' + esc(eq.id) + '">'
+        + '<span class="top"><span><h3>' + esc(eq.nombre) + '</h3><p class="tipo">' + esc(eq.tipo) + '</p></span>'
+        + '<span class="pill ' + estadoClass(eq.estado) + '">' + esc(eq.estado) + '</span></span>'
+        + '<span class="meta"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>' + esc(eq.ubicacion) + '</span>'
+        + '<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4.5 4.5 0 0 0-6 6L3 18l3 3 5.7-5.7a4.5 4.5 0 0 0 6-6L14 13l-3-3 3.7-3.7Z"/></svg>Últ. mant.: ' + esc(eq.ultimoMant) + '</span></span>'
+        + '</button>';
+    });
+    $("eq-list").innerHTML = html;
+    document.querySelectorAll(".eq-card").forEach(function(card){
+      card.addEventListener("click", function(){ openDetalle(card.getAttribute("data-eq")); });
+    });
+    renderHomeCards();
+  }
+
+  function getEquipo(id){
+    for(var i=0;i<equipos.length;i++){ if(equipos[i].id === id) return equipos[i]; }
+    return null;
+  }
+
+  function openDetalle(id){
+    var eq = getEquipo(id);
+    if(!eq) return;
+    currentEquipoId = id;
+    renderDetalle(eq);
+    showScreen("detalle");
+  }
+
+  function renderDetalle(eq){
+    $("det-nombre").textContent = eq.nombre;
+    $("det-tipo").textContent = eq.tipo;
+    var pill = $("det-pill");
+    pill.textContent = eq.estado;
+    pill.className = "pill " + estadoClass(eq.estado);
+    $("det-info-tipo").textContent = eq.tipo;
+    $("det-ubicacion").textContent = eq.ubicacion;
+    $("det-estado").textContent = eq.estado;
+    $("det-mant").textContent = eq.ultimoMant;
+    $("rep-estado").value = eq.estado;
+    $("rep-comentario").value = "";
+    $("report-saved").classList.remove("show");
+    var html = "";
+    if(!eq.historial.length){
+      html = '<p class="empty-note">Sin registros todavía.</p>';
+    } else {
+      eq.historial.forEach(function(h){
+        html += '<div class="hist-item"><span class="dot ' + estadoClass(h.estado) + '"></span><span>'
+          + '<span class="when">' + esc(h.fecha) + '</span>'
+          + '<p class="what">' + esc(h.estado) + '</p>'
+          + (h.comentario ? '<p class="cmt">' + esc(h.comentario) + '</p>' : '')
+          + '</span></div>';
+      });
+    }
+    $("det-historial").innerHTML = html;
+  }
+
+  $("report-form").addEventListener("submit", function(ev){
+    ev.preventDefault();
+    var eq = getEquipo(currentEquipoId);
+    if(!eq) return;
+    var nuevo = $("rep-estado").value;
+    var comentario = $("rep-comentario").value.trim();
+    eq.estado = nuevo;
+    eq.historial.unshift({ fecha: ahoraTexto(), estado: nuevo, comentario: comentario || "Actualización de estado sin comentario." });
+    saveJSON("cetemin_equipos_v1", equipos);
+    renderEquipos();
+    renderDetalle(eq);
+    $("report-saved").classList.add("show");
+  });
+
+  /* ---------- EPP · Control de stock ---------- */
+  function stockDe(item){
+    var v = stockData[item.nombre];
+    return (typeof v === "number") ? v : item.stock;
+  }
+  function itemsBajoMinimo(){
+    return EPP_DATA.filter(function(it){ return stockDe(it) < it.min; });
+  }
+  function renderEPP(){
+    var lows = itemsBajoMinimo();
+    var alertBox = $("epp-alert");
+    if(alertBox){
+      if(lows.length){
+        var lis = "";
+        lows.forEach(function(it){
+          lis += "<li><strong>" + esc(it.nombre) + ":</strong> quedan " + stockDe(it) + " und. y el mínimo permitido es " + it.min + ".</li>";
         });
-
-        function checkOnlineStatus() {
-            const dot = document.getElementById('connectionDot');
-            const txt = document.getElementById('connectionText');
-            if (navigator.onLine) {
-                dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
-                txt.textContent = "Sistema Conectado";
-            } else {
-                dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
-                txt.textContent = "Modo Subterráneo (Offline)";
-            }
+        alertBox.innerHTML = '<div class="alert-banner"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg> Alerta: stock bajo el mínimo</h3><ul>'
+          + lis + '</ul><p>Avisa a SSOMA o al encargado para reponer antes de la próxima práctica.</p></div>';
+      } else {
+        alertBox.innerHTML = "";
+      }
+    }
+    var puedeEditarStock = session && (session.rol === "encargado" || session.rol === "ssoma");
+    /* SSOMA no se pide a sí mismo: con el rol SSOMA no se muestra el bloque «Pedir a SSOMA». */
+    var esSSOMA = session && session.rol === "ssoma";
+    var html = "";
+    EPP_DATA.forEach(function(item, idx){
+      var stock = stockDe(item);
+      var low = stock < item.min;
+      var iconSvg = ICONS[item.icon] || ICONS.casco;
+      if(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches){
+        iconSvg = iconSvg.replace(/#0b2a4a/g, "#ffb800");
+      }
+      var sugerida = low ? Math.max(1, item.min - stock) : 10;
+      html += '<div class="epp-card' + (low ? ' low' : '') + '"><span class="ic" aria-hidden="true">' + iconSvg + '</span>'
+        + '<span class="epp-main"><h3>' + esc(item.nombre) + '</h3><p class="det">' + esc(item.det) + '</p>'
+        + '<span class="stock-row">'
+        + (puedeEditarStock ? '<button type="button" class="btn-stock" data-stock-delta="-1" data-stock-name="' + esc(item.nombre) + '" aria-label="Quitar una unidad de ' + esc(item.nombre) + '">−</button>' : '')
+        + '<span class="stock-num">' + stock + ' und.</span>'
+        + (puedeEditarStock ? '<button type="button" class="btn-stock" data-stock-delta="1" data-stock-name="' + esc(item.nombre) + '" aria-label="Agregar una unidad de ' + esc(item.nombre) + '">+</button>' : '')
+        + '<span class="stock-min' + (low ? ' low' : '') + '">Stock mín.: ' + item.min + '</span>'
+        + '</span>'
+        + (puedeEditarStock
+          ? '<span class="stock-edit"><label for="stock-input-' + idx + '">Editar stock</label>'
+            + '<input type="number" min="0" step="1" id="stock-input-' + idx + '" value="' + stock + '" data-stock-input="' + esc(item.nombre) + '" />'
+            + '<button type="button" class="btn-save-stock" data-stock-save="' + esc(item.nombre) + '">Guardar</button></span>'
+          : '')
+        + (esSSOMA ? '' : '<span class="order-box"><span class="order-row">'
+        + '<select data-order-tipo="' + esc(item.nombre) + '" aria-label="Tipo de solicitud para ' + esc(item.nombre) + '"><option value="Reposición de stock">Reposición de stock</option><option value="Renovación de EPP">Renovación de EPP</option></select>'
+        + '<input type="number" min="1" step="1" value="' + sugerida + '" data-order-cant="' + esc(item.nombre) + '" aria-label="Cantidad a pedir de ' + esc(item.nombre) + '" />'
+        + '<button type="button" class="btn-order" data-order-btn="' + esc(item.nombre) + '">Pedir a SSOMA</button>'
+        + '</span><span class="order-hint">El pedido llega a SSOMA como Pendiente; SSOMA lo aprueba desde su panel.</span></span>')
+        + '</span>'
+        + '<span class="pill ' + (low ? 'fuera' : eppClass(item.estado)) + '">' + (low ? 'Stock bajo' : esc(item.estado)) + '</span></div>';
+    });
+    $("epp-list").innerHTML = html;
+    $("epp-list").querySelectorAll("[data-stock-delta]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var name = b.getAttribute("data-stock-name");
+        var item = null;
+        EPP_DATA.forEach(function(it){ if(it.nombre === name) item = it; });
+        if(!item) return;
+        var nuevo = Math.max(0, stockDe(item) + parseInt(b.getAttribute("data-stock-delta"), 10));
+        stockData[item.nombre] = nuevo;
+        saveJSON("cetemin_stock_v1", stockData);
+        renderEPP();
+      });
+    });
+    $("epp-list").querySelectorAll("[data-stock-save]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var name = b.getAttribute("data-stock-save");
+        var inp = $("epp-list").querySelector('[data-stock-input="' + name.replace(/"/g, '\\"') + '"]');
+        if(!inp) return;
+        var v = parseInt(inp.value, 10);
+        if(isNaN(v) || v < 0) v = 0;
+        stockData[name] = v;
+        saveJSON("cetemin_stock_v1", stockData);
+        renderEPP();
+        renderPedidos();
+      });
+    });
+    $("epp-list").querySelectorAll("[data-order-btn]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var name = b.getAttribute("data-order-btn");
+        var sel = $("epp-list").querySelector('[data-order-tipo="' + name.replace(/"/g, '\\"') + '"]');
+        var inp = $("epp-list").querySelector('[data-order-cant="' + name.replace(/"/g, '\\"') + '"]');
+        var cant = inp ? parseInt(inp.value, 10) : 0;
+        if(isNaN(cant) || cant < 1) cant = 1;
+        pedidos.unshift({
+          id: "ped" + Date.now(),
+          epp: name,
+          tipo: sel ? sel.value : "Reposición de stock",
+          cantidad: cant,
+          solicitante: session ? session.email : "—",
+          fecha: ahoraTexto(),
+          estado: "Pendiente"
+        });
+        saveJSON("cetemin_pedidos_v1", pedidos);
+        renderPedidos();
+        var msg = $("pedido-saved");
+        if(msg){
+          msg.textContent = "Pedido enviado a SSOMA: " + cant + " und. de " + name + " (" + (sel ? sel.value : "Reposición de stock") + "). Quedó en estado Pendiente.";
+          msg.classList.add("show");
+          setTimeout(function(){ msg.classList.remove("show"); }, 4500);
         }
+      });
+    });
+    renderHomeCards();
+  }
 
-        function loadOfflineReports() {
-            const localData = localStorage.getItem('geoflash_offline_reports');
-            if (localData) {
-                try {
-                    reportsCache = JSON.parse(localData);
-                    renderFeed(reportsCache);
-                } catch(e) { console.error(e); }
-            }
+  /* ---------- Pedidos a SSOMA (reposición y renovación de EPP) ---------- */
+  function pedidoPill(estado){
+    if(estado === "Aprobado") return "aprobado";
+    if(estado === "Rechazado") return "rechazado";
+    return "pendiente";
+  }
+  function pedidoCardHTML(p, conAcciones){
+    var esSSOMA = session && session.rol === "ssoma";
+    var h = '<div class="pedido-card"><div class="top"><span><h3>' + esc(p.epp) + ' · ' + p.cantidad + ' und.</h3>'
+      + '<p class="when">' + esc(p.fecha || "") + ' · Solicita: ' + esc(p.solicitante || "—") + '</p></span>'
+      + '<span class="pill ' + pedidoPill(p.estado) + '">' + esc(p.estado) + '</span></div>'
+      + '<p class="det"><strong>Tipo:</strong> ' + esc(p.tipo) + '</p>';
+    if(conAcciones && esSSOMA && p.estado === "Pendiente"){
+      h += '<div class="pedido-actions"><button type="button" class="btn-approve" data-ped-approve="' + esc(p.id) + '">Aprobar</button>'
+        + '<button type="button" class="btn-reject" data-ped-reject="' + esc(p.id) + '">Rechazar</button></div>';
+    }
+    if(p.estado === "Aprobado" && p.tipo === "Reposición de stock"){
+      h += '<p class="det">Stock actualizado: se sumaron ' + p.cantidad + ' und. a «' + esc(p.epp) + '» al aprobarse.</p>';
+    }
+    if(p.estado !== "Pendiente" && p.fechaResolucion){
+      h += '<p class="det"><strong>Resuelto:</strong> ' + esc(p.fechaResolucion) + (p.resueltoPor ? ' · por ' + esc(p.resueltoPor) : '') + '</p>';
+    }
+    h += '</div>';
+    return h;
+  }
+  function bindPedidoActions(scope){
+    if(!scope) return;
+    scope.querySelectorAll("[data-ped-approve]").forEach(function(b){
+      b.addEventListener("click", function(){ resolverPedido(b.getAttribute("data-ped-approve"), true); });
+    });
+    scope.querySelectorAll("[data-ped-reject]").forEach(function(b){
+      b.addEventListener("click", function(){ resolverPedido(b.getAttribute("data-ped-reject"), false); });
+    });
+  }
+  function resolverPedido(id, aprobar){
+    var p = null;
+    pedidos.forEach(function(x){ if(x.id === id) p = x; });
+    if(!p || p.estado !== "Pendiente") return;
+    p.estado = aprobar ? "Aprobado" : "Rechazado";
+    p.resueltoPor = session ? session.email : "SSOMA";
+    p.fechaResolucion = ahoraTexto();
+    if(aprobar && p.tipo === "Reposición de stock"){
+      var item = null;
+      EPP_DATA.forEach(function(it){ if(it.nombre === p.epp) item = it; });
+      if(item){
+        stockData[p.epp] = stockDe(item) + p.cantidad;
+        saveJSON("cetemin_stock_v1", stockData);
+      }
+    }
+    saveJSON("cetemin_pedidos_v1", pedidos);
+    renderEPP();
+    renderPedidos();
+    renderSSOMA();
+    var msg = $("ssoma-saved");
+    if(msg && currentScreen === "ssoma"){
+      msg.textContent = aprobar
+        ? "Solicitud aprobada («Aprobado») y movida al Historial." + (p.tipo === "Reposición de stock" ? " El stock de " + p.epp + " se actualizó." : "")
+        : "Solicitud rechazada y movida al Historial.";
+      msg.classList.add("show");
+      setTimeout(function(){ msg.classList.remove("show"); }, 4000);
+    }
+  }
+  function renderPedidos(){
+    var box = $("pedidos-list");
+    if(!box) return;
+    if(!pedidos.length){
+      box.innerHTML = '<p class="empty-note">Todavía no hay pedidos. Usa el botón «Pedir a SSOMA» en cualquier tarjeta de EPP para crear el primero.</p>';
+      return;
+    }
+    var html = "";
+    pedidos.forEach(function(p){ html += pedidoCardHTML(p, true); });
+    box.innerHTML = html;
+    bindPedidoActions(box);
+  }
+
+  /* ---------- Tarjetas Equipos / EPP del carrusel superior ---------- */
+  function renderHomeCards(){
+    var eqStats = $("home-eq-stats"), eppStats = $("home-epp-stats");
+    if(!eqStats || !eppStats) return;
+    var op = 0, mant = 0, fuera = 0;
+    equipos.forEach(function(eq){
+      if(eq.estado === "Operativo") op++;
+      else if(eq.estado === "En mantenimiento") mant++;
+      else fuera++;
+    });
+    eqStats.innerHTML = '<span class="pill op">' + op + ' operativos</span><span class="pill mant">' + mant + ' en mantenimiento</span><span class="pill fuera">' + fuera + ' fuera de servicio</span>';
+    var eqPill = $("home-eq-pill");
+    if(eqPill){
+      eqPill.textContent = equipos.length + " equipos";
+      eqPill.className = "pill " + (fuera ? "fuera" : "op");
+    }
+    var eqDet = $("home-eq-det");
+    if(eqDet){
+      var enMant = equipos.filter(function(e){ return e.estado !== "Operativo"; }).map(function(e){ return e.nombre + " (" + e.estado.toLowerCase() + ")"; });
+      eqDet.textContent = enMant.length ? "Con novedad: " + enMant.join(" · ") : "Toda la maquinaria está operativa.";
+    }
+    var lows = itemsBajoMinimo();
+    var totalUnd = 0;
+    EPP_DATA.forEach(function(it){ totalUnd += stockDe(it); });
+    var pend = pedidos.filter(function(p){ return p.estado === "Pendiente"; }).length;
+    eppStats.innerHTML = '<span class="pill op">' + EPP_DATA.length + ' tipos de EPP</span><span class="pill mant">' + totalUnd + ' und. en total</span>'
+      + (pend ? '<span class="pill pendiente">' + pend + ' pedido' + (pend === 1 ? "" : "s") + ' pendiente' + (pend === 1 ? "" : "s") + '</span>' : '<span class="pill aprobado">Sin pedidos pendientes</span>');
+    var eppPill = $("home-epp-pill");
+    if(eppPill){
+      eppPill.textContent = lows.length ? "Stock bajo" : "Stock en orden";
+      eppPill.className = "pill " + (lows.length ? "fuera" : "op");
+    }
+    var eppAlert = $("home-epp-alert");
+    if(eppAlert){
+      if(lows.length){
+        eppAlert.textContent = "Bajo el mínimo: " + lows.map(function(it){ return it.nombre + " (" + stockDe(it) + "/" + it.min + ")"; }).join(", ") + ". Pide reposición a SSOMA desde la tarjeta de EPP.";
+        eppAlert.classList.remove("ok");
+      } else {
+        eppAlert.textContent = "Ningún EPP está bajo su stock mínimo.";
+        eppAlert.classList.add("ok");
+      }
+    }
+  }
+
+  /* ---------- IPERC continuo ---------- */
+  var MATRIZ_SEV = ["Catastrófico", "Mortalidad", "Permanente", "Temporal", "Menor"];
+  var MATRIZ_VALORES = {
+    "Catastrófico": [1, 2, 4, 7, 11],
+    "Mortalidad": [3, 5, 8, 12, 16],
+    "Permanente": [6, 9, 13, 17, 20],
+    "Temporal": [10, 14, 18, 21, 23],
+    "Menor": [15, 19, 22, 24, 25]
+  };
+  var MATRIZ_FREC = ["A", "B", "C", "D", "E"];
+  var FREC_NOMBRE = { A: "Común", B: "Ha sucedido", C: "Podría suceder", D: "Raro que suceda", E: "Prácticamente imposible que suceda" };
+
+  function nivelDe(valor){
+    if(valor == null) return null;
+    if(valor <= 8) return { letra: "A", nivel: "Alto", cls: "alto", pill: "fuera" };
+    if(valor <= 15) return { letra: "M", nivel: "Medio", cls: "medio", pill: "mant" };
+    return { letra: "B", nivel: "Bajo", cls: "bajo", pill: "op" };
+  }
+  function hoyISO(){
+    var d = new Date();
+    function p(n){ return (n < 10 ? "0" : "") + n; }
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+  }
+  function fechaBonita(iso){
+    if(!iso) return "";
+    var p = String(iso).split("-");
+    if(p.length !== 3) return String(iso);
+    var meses = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+    return parseInt(p[2], 10) + " " + meses[parseInt(p[1], 10) - 1] + " " + p[0];
+  }
+
+  /* Registro de ejemplo (el de la captura): se siembra solo la primera vez */
+  if(!iperc){
+    iperc = [{
+      id: "ip-ejemplo",
+      fechaRegistro: "21 oct 2026, 08:00",
+      sede: "ABQ", area: "Mina escuela", fecha: hoyISO(),
+      actividad: "Perforación en frente (banco)",
+      trabajadores: [],
+      evaluaciones: [{
+        peligro: "Roca suelta / inestable en el frente",
+        riesgo: "Caída de rocas, aplastamiento",
+        iper: { sev: "Menor", frec: "B", valor: 19 },
+        control: "Inspección visual y evaluación geomecánica, desatado de rocas",
+        residual: { sev: "Temporal", frec: "C", valor: 18 }
+      }],
+      secuencias: ["Inspeccionar el frente y desatar las rocas sueltas antes de iniciar la perforación."],
+      hora: "", supervisor: "", adjunto: null,
+      validacionSSOMA: "Pendiente", accionCorrectiva: "Pendiente"
+    }];
+    saveJSON("cetemin_iperc_v2", iperc);
+  }
+
+  /* Estado del formulario */
+  function nuevaEval(){ return { peligro: "", riesgo: "", iper: null, control: "", residual: null }; }
+  var formWorkers = [{ doc: "", nombre: "" }];
+  var formEvals = [nuevaEval()];
+  var formSeqs = [""];
+  var formAdjunto = null;
+  var matrizTarget = null;
+
+  function renderWorkers(){
+    var html = "";
+    formWorkers.forEach(function(w, i){
+      html += '<div class="wrow"><div class="wrow-head"><span>Trabajador / estudiante N° ' + (i + 1) + '</span>'
+        + (formWorkers.length > 1 ? '<button type="button" class="btn-mini-del" data-wdel="' + i + '">Quitar</button>' : '')
+        + '</div>'
+        + '<div class="field"><label>Documento de identidad</label><input type="text" data-wdoc="' + i + '" value="' + esc(w.doc) + '" placeholder="DNI" /></div>'
+        + '<div class="field" style="margin-bottom:0;"><label>Nombres y apellidos</label><input type="text" data-wnom="' + i + '" value="' + esc(w.nombre) + '" placeholder="Nombres y apellidos" /></div></div>';
+    });
+    $("workers-box").innerHTML = html;
+    $("workers-box").querySelectorAll("[data-wdoc]").forEach(function(inp){
+      inp.addEventListener("input", function(){ formWorkers[+inp.getAttribute("data-wdoc")].doc = inp.value; });
+    });
+    $("workers-box").querySelectorAll("[data-wnom]").forEach(function(inp){
+      inp.addEventListener("input", function(){ formWorkers[+inp.getAttribute("data-wnom")].nombre = inp.value; });
+    });
+    $("workers-box").querySelectorAll("[data-wdel]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        formWorkers.splice(+btn.getAttribute("data-wdel"), 1);
+        renderWorkers();
+      });
+    });
+  }
+
+  function evalGroupHTML(ev, tipo, i){
+    var sel = ev[tipo];
+    var niv = sel ? nivelDe(sel.valor) : null;
+    var chips = "";
+    ["A", "M", "B"].forEach(function(L){
+      var cls = L === "A" ? "a" : (L === "M" ? "m" : "b");
+      chips += '<span class="chip ' + cls + (niv && niv.letra === L ? " on" : "") + '">' + L + '</span>';
+    });
+    var det = sel
+      ? "Severidad: " + esc(sel.sev) + " · Frecuencia: " + sel.frec + " (" + esc(FREC_NOMBRE[sel.frec]) + ") · Nivel " + niv.nivel
+      : 'Sin calificar. Presiona "Matriz" y toca una celda.';
+    return '<span class="eval-group-t">' + (tipo === "iper" ? "Evaluación IPER" : "Evaluación riesgo residual") + '</span>'
+      + '<div class="eval-line">' + chips
+      + '<button type="button" class="eval-value' + (niv ? " " + niv.cls : "") + '" data-matriz="' + tipo + '" data-ei="' + i + '">' + (sel ? sel.valor : "–") + '</button>'
+      + '<button type="button" class="btn-matriz" data-matriz="' + tipo + '" data-ei="' + i + '">Matriz</button></div>'
+      + '<p class="eval-det">' + det + '</p>';
+  }
+
+  function renderEvals(){
+    var html = "";
+    formEvals.forEach(function(ev, i){
+      html += '<div class="eval-card"><div class="eval-head"><span>Evaluación ' + (i + 1) + '</span>'
+        + (formEvals.length > 1 ? '<button type="button" class="btn-mini-del" data-edel="' + i + '">Eliminar fila</button>' : '')
+        + '</div>'
+        + '<div class="field"><label>Peligro</label><input type="text" data-ef="peligro" data-ei="' + i + '" value="' + esc(ev.peligro) + '" placeholder="Ej.: Roca suelta / inestable" /></div>'
+        + '<div class="field"><label>Riesgo / Consecuencia</label><input type="text" data-ef="riesgo" data-ei="' + i + '" value="' + esc(ev.riesgo) + '" placeholder="Ej.: Caída de rocas, aplastamiento" /></div>'
+        + '<div class="eval-group">' + evalGroupHTML(ev, "iper", i) + '</div>'
+        + '<div class="field"><label>Medidas de control a implementar</label><input type="text" data-ef="control" data-ei="' + i + '" value="' + esc(ev.control) + '" placeholder="Ej.: Inspección visual y evaluación geomecánica" /></div>'
+        + '<div class="eval-group" style="margin-bottom:0;">' + evalGroupHTML(ev, "residual", i) + '</div>'
+        + '</div>';
+    });
+    $("evals-box").innerHTML = html;
+    $("evals-box").querySelectorAll("[data-ef]").forEach(function(inp){
+      inp.addEventListener("input", function(){
+        formEvals[+inp.getAttribute("data-ei")][inp.getAttribute("data-ef")] = inp.value;
+      });
+    });
+    $("evals-box").querySelectorAll("[data-matriz]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        openMatriz(+btn.getAttribute("data-ei"), btn.getAttribute("data-matriz"));
+      });
+    });
+    $("evals-box").querySelectorAll("[data-edel]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        formEvals.splice(+btn.getAttribute("data-edel"), 1);
+        renderEvals();
+      });
+    });
+  }
+
+  function renderSeqs(){
+    var html = "";
+    formSeqs.forEach(function(s, i){
+      html += '<div class="srow"><span class="s-num">' + (i + 1) + '</span>'
+        + '<input type="text" data-seq="' + i + '" value="' + esc(s) + '" placeholder="Escribe la secuencia para controlar el peligro y reducir el riesgo" />'
+        + (formSeqs.length > 1 ? '<button type="button" class="btn-mini-del" data-sdel="' + i + '" aria-label="Quitar paso">&times;</button>' : '')
+        + '</div>';
+    });
+    $("seqs-box").innerHTML = html;
+    $("seqs-box").querySelectorAll("[data-seq]").forEach(function(inp){
+      inp.addEventListener("input", function(){ formSeqs[+inp.getAttribute("data-seq")] = inp.value; });
+    });
+    $("seqs-box").querySelectorAll("[data-sdel]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        formSeqs.splice(+btn.getAttribute("data-sdel"), 1);
+        renderSeqs();
+      });
+    });
+  }
+
+  $("btn-add-worker").addEventListener("click", function(){ formWorkers.push({ doc: "", nombre: "" }); renderWorkers(); });
+  $("btn-add-eval").addEventListener("click", function(){ formEvals.push(nuevaEval()); renderEvals(); });
+  $("btn-add-seq").addEventListener("click", function(){ formSeqs.push(""); renderSeqs(); });
+
+  /* ---------- Matriz de evaluación ---------- */
+  function buildMatriz(){
+    var html = '<table class="matriz-table"><tbody>';
+    MATRIZ_SEV.forEach(function(sev, r){
+      html += '<tr><th class="sev-cell">' + esc(sev) + ' <span class="n">' + (r + 1) + '</span></th>';
+      MATRIZ_VALORES[sev].forEach(function(v, c){
+        html += '<td><button type="button" class="mcell ' + nivelDe(v).cls + '" data-sev="' + esc(sev) + '" data-frec="' + MATRIZ_FREC[c] + '" data-valor="' + v + '">' + v + '</button></td>';
+      });
+      html += '</tr>';
+    });
+    html += '<tr><td></td>';
+    MATRIZ_FREC.forEach(function(f){ html += '<td class="freq-letter">' + f + '</td>'; });
+    html += '</tr><tr><td></td>';
+    MATRIZ_FREC.forEach(function(f){ html += '<td class="freq-name">' + esc(FREC_NOMBRE[f]) + '</td>'; });
+    html += '</tr></tbody></table><div class="freq-bar">FRECUENCIA</div>';
+    $("matriz-grid").innerHTML = html;
+    $("matriz-grid").querySelectorAll(".mcell").forEach(function(cell){
+      cell.addEventListener("click", function(){
+        if(!matrizTarget) return;
+        formEvals[matrizTarget.idx][matrizTarget.tipo] = {
+          sev: cell.getAttribute("data-sev"),
+          frec: cell.getAttribute("data-frec"),
+          valor: parseInt(cell.getAttribute("data-valor"), 10)
+        };
+        closeMatriz();
+        renderEvals();
+      });
+    });
+  }
+  function openMatriz(idx, tipo){
+    matrizTarget = { idx: idx, tipo: tipo };
+    $("matriz-title-sub").textContent = (tipo === "iper" ? "Calificando: Evaluación IPER" : "Calificando: Riesgo residual") + " · Evaluación " + (idx + 1) + " — selecciona una frecuencia";
+    var cur = formEvals[idx][tipo];
+    $("matriz-grid").querySelectorAll(".mcell").forEach(function(cell){
+      var on = cur && cell.getAttribute("data-sev") === cur.sev && cell.getAttribute("data-frec") === cur.frec;
+      cell.classList.toggle("sel", !!on);
+    });
+    $("matriz-modal").hidden = false;
+    document.body.style.overflow = "hidden";
+  }
+  function closeMatriz(){
+    $("matriz-modal").hidden = true;
+    matrizTarget = null;
+    document.body.style.overflow = "";
+  }
+  $("matriz-close").addEventListener("click", closeMatriz);
+  $("matriz-modal").addEventListener("click", function(ev){ if(ev.target === this) closeMatriz(); });
+
+  /* ---------- Adjunto (imagen de evidencia) ---------- */
+  function renderAdjunto(){
+    var box = $("adj-preview");
+    if(formAdjunto){
+      box.innerHTML = '<img src="' + formAdjunto + '" alt="Imagen de evidencia adjunta" /><button type="button" class="btn-mini-del" id="adj-remove">Quitar imagen</button>';
+      $("adj-remove").addEventListener("click", function(){
+        formAdjunto = null;
+        $("adj-input").value = "";
+        renderAdjunto();
+      });
+    } else {
+      box.innerHTML = "";
+    }
+  }
+  $("adj-input").addEventListener("change", function(){
+    var file = this.files && this.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      var img = new Image();
+      img.onload = function(){
+        try{
+          var max = 900;
+          var scale = Math.min(1, max / Math.max(img.width, img.height));
+          var canvas = document.createElement("canvas");
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+          canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+          formAdjunto = canvas.toDataURL("image/jpeg", 0.82);
+        }catch(e){ formAdjunto = reader.result; }
+        renderAdjunto();
+      };
+      img.onerror = function(){ formAdjunto = reader.result; renderAdjunto(); };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  /* Arranque del formulario IPERC */
+  $("f-fecha").value = hoyISO();
+  $("f-hora").value = horaHMS();
+  buildMatriz();
+  renderWorkers();
+  renderEvals();
+  renderSeqs();
+
+  $("iperc-form").addEventListener("submit", function(ev){
+    ev.preventDefault();
+    var actividad = $("f-actividad").value.trim();
+    var conPeligro = formEvals.some(function(e){ return e.peligro.trim() !== ""; });
+    var sinCalificar = formEvals.some(function(e){
+      return (e.peligro.trim() !== "" || e.riesgo.trim() !== "") && !e.iper;
+    });
+    var err = "";
+    if(!actividad) err = "Escribe la descripción de la actividad.";
+    else if(!conPeligro) err = "Escribe al menos un peligro en la evaluación de riesgos.";
+    else if(sinCalificar) err = "Califica la Evaluación IPER con la Matriz en cada peligro que escribas.";
+    if(err){
+      $("iperc-error").textContent = err;
+      $("iperc-error").classList.add("show");
+      return;
+    }
+    $("iperc-error").classList.remove("show");
+    var trabajadores = formWorkers
+      .filter(function(w){ return w.doc.trim() !== "" || w.nombre.trim() !== ""; })
+      .map(function(w){ return { doc: w.doc.trim(), nombre: w.nombre.trim() }; });
+    var evaluaciones = formEvals
+      .filter(function(e){ return e.peligro.trim() !== "" || e.riesgo.trim() !== ""; })
+      .map(function(e){
+        return { peligro: e.peligro.trim(), riesgo: e.riesgo.trim(), iper: e.iper, control: e.control.trim(), residual: e.residual };
+      });
+    var secuencias = formSeqs.map(function(s){ return s.trim(); }).filter(function(s){ return s !== ""; });
+    iperc.unshift({
+      id: "ip" + Date.now(),
+      fechaRegistro: ahoraTexto(),
+      sede: $("f-sede").value,
+      area: $("f-area").value.trim(),
+      fecha: $("f-fecha").value,
+      actividad: actividad,
+      trabajadores: trabajadores,
+      evaluaciones: evaluaciones,
+      secuencias: secuencias,
+      hora: $("f-hora").value,
+      supervisor: $("f-supervisor").value.trim(),
+      adjunto: formAdjunto,
+      validacionSSOMA: "Pendiente",
+      accionCorrectiva: "Pendiente"
+    });
+    saveJSON("cetemin_iperc_v2", iperc);
+    $("f-area").value = ""; $("f-actividad").value = ""; $("f-fecha").value = hoyISO();
+    $("f-hora").value = horaHMS(); $("f-supervisor").value = "";
+    formWorkers = [{ doc: "", nombre: "" }];
+    formEvals = [nuevaEval()];
+    formSeqs = [""];
+    formAdjunto = null;
+    $("adj-input").value = "";
+    renderWorkers(); renderEvals(); renderSeqs(); renderAdjunto();
+    renderIperc();
+    $("iperc-saved").classList.add("show");
+    setTimeout(function(){ $("iperc-saved").classList.remove("show"); }, 3500);
+  });
+
+  function evalPill(sel, etiqueta){
+    if(!sel) return '<span class="pill mant">' + etiqueta + ' sin calificar</span>';
+    var niv = nivelDe(sel.valor);
+    return '<span class="pill ' + niv.pill + '">' + etiqueta + ' ' + sel.valor + ' · ' + niv.nivel + '</span>';
+  }
+
+  function detalleHTML(r){
+    var h = "";
+    h += '<div class="info-row"><span class="k">Registrado el</span><span class="v">' + esc(r.fechaRegistro || "") + '</span></div>';
+    h += '<div class="info-row"><span class="k">Fecha de la actividad</span><span class="v">' + esc(fechaBonita(r.fecha)) + '</span></div>';
+    h += '<div class="info-row"><span class="k">Sede</span><span class="v">' + esc(r.sede || "—") + '</span></div>';
+    h += '<div class="info-row"><span class="k">Área</span><span class="v">' + esc(r.area || "—") + '</span></div>';
+    if(r.trabajadores && r.trabajadores.length){
+      h += '<h4>Trabajadores / estudiantes</h4>';
+      r.trabajadores.forEach(function(w, i){
+        h += '<p>' + (i + 1) + '. ' + esc(w.nombre) + (w.doc ? ' · Doc. ' + esc(w.doc) : '') + '</p>';
+      });
+    }
+    (r.evaluaciones || []).forEach(function(ev2, i){
+      h += '<h4>Evaluación ' + (i + 1) + '</h4>';
+      h += '<p><strong>Peligro:</strong> ' + esc(ev2.peligro) + '</p>';
+      h += '<p><strong>Riesgo / consecuencia:</strong> ' + esc(ev2.riesgo || "—") + '</p>';
+      h += '<p><strong>Evaluación IPER:</strong> ' + (ev2.iper
+        ? ev2.iper.valor + ' (' + nivelDe(ev2.iper.valor).nivel + ') · Severidad ' + esc(ev2.iper.sev) + ' × Frecuencia ' + ev2.iper.frec + ' (' + esc(FREC_NOMBRE[ev2.iper.frec]) + ')'
+        : 'Sin calificar') + '</p>';
+      h += '<p><strong>Medidas de control:</strong> ' + esc(ev2.control || "—") + '</p>';
+      h += '<p><strong>Riesgo residual:</strong> ' + (ev2.residual
+        ? ev2.residual.valor + ' (' + nivelDe(ev2.residual.valor).nivel + ') · Severidad ' + esc(ev2.residual.sev) + ' × Frecuencia ' + ev2.residual.frec + ' (' + esc(FREC_NOMBRE[ev2.residual.frec]) + ')'
+        : 'Sin calificar') + '</p>';
+    });
+    if(r.secuencias && r.secuencias.length){
+      h += '<h4>Secuencia para controlar el peligro</h4>';
+      r.secuencias.forEach(function(s, i){ h += '<p>' + (i + 1) + '. ' + esc(s) + '</p>'; });
+    }
+    if(r.supervisor || r.hora){
+      h += '<h4>Verificación de controles</h4>';
+      h += '<p><strong>Supervisor:</strong> ' + esc(r.supervisor || "—") + (r.hora ? ' · <strong>Hora:</strong> ' + esc(r.hora) : '') + '</p>';
+    }
+    if(r.adjunto){
+      h += '<h4>Archivo adjunto</h4><img src="' + r.adjunto + '" alt="Imagen de evidencia del registro IPERC" />';
+    }
+    return h;
+  }
+
+  function renderIperc(){
+    var box = $("iperc-list");
+    if(!iperc || !iperc.length){
+      box.innerHTML = '<p class="empty-note">Todavía no hay registros IPERC guardados. Completa el formato para crear el primero.</p>';
+      return;
+    }
+    var html = "";
+    iperc.forEach(function(r){
+      html += '<div class="iperc-item"><div class="top"><span><h3>' + esc(r.actividad) + '</h3>'
+        + '<p class="when">' + esc(fechaBonita(r.fecha)) + ' · Sede ' + esc(r.sede || "—") + (r.area ? " · " + esc(r.area) : "") + '</p></span></div>';
+      (r.evaluaciones || []).forEach(function(ev2){
+        html += '<div class="eval-sum"><p class="eval-sum-p">' + esc(ev2.peligro) + '</p>'
+          + '<div class="eval-sum-pills">' + evalPill(ev2.iper, "IPER") + '<span class="arrow">→</span>' + evalPill(ev2.residual, "Residual") + '</div></div>';
+      });
+      var val = r.validacionSSOMA || "Pendiente";
+      var acc = r.accionCorrectiva || "Pendiente";
+      html += '<div class="eval-sum"><div class="eval-sum-pills"><span class="pill ' + (val === "Validado" ? "aprobado" : (val === "Observado" ? "renovar" : "pendiente")) + '">SSOMA: ' + esc(val) + '</span>'
+        + '<span class="pill ' + (acc === "Verificada" ? "aprobado" : "pendiente") + '">Acción correctiva: ' + esc(acc) + '</span></div></div>';
+      html += '<div class="item-actions"><button type="button" class="btn-mini" data-detail="' + esc(r.id) + '">Ver detalle</button>'
+        + '<button type="button" class="btn-del" data-del="' + esc(r.id) + '">Eliminar</button></div>'
+        + '<div class="iperc-detail" id="detail-' + esc(r.id) + '">' + detalleHTML(r) + '</div></div>';
+    });
+    box.innerHTML = html;
+    box.querySelectorAll("[data-del]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var id = btn.getAttribute("data-del");
+        iperc = iperc.filter(function(r){ return r.id !== id; });
+        saveJSON("cetemin_iperc_v2", iperc);
+        renderIperc();
+      });
+    });
+    box.querySelectorAll("[data-detail]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var d = document.getElementById("detail-" + btn.getAttribute("data-detail"));
+        if(!d) return;
+        d.classList.toggle("show");
+        btn.textContent = d.classList.contains("show") ? "Ocultar detalle" : "Ver detalle";
+      });
+    });
+  }
+
+  $("btn-ssoma").addEventListener("click", function(){
+    $("ssoma-text").classList.toggle("show");
+  });
+
+  /* ---------- Accidentes e incidentes ---------- */
+  function gravedadPill(g){
+    if(!g) return "op";
+    if(g.indexOf("Grave") === 0) return "fuera";
+    if(g === "Moderada") return "mant";
+    return "op";
+  }
+
+  /* Contadores independientes por gravedad (solo eventos tipo Accidente) */
+  function contarAccidentes(){
+    var leves = 0, graves = 0;
+    (accidentes || []).forEach(function(r){
+      if(!(r.tipo && r.tipo.indexOf("Accidente") === 0)) return;
+      if(r.gravedad === "Leve") leves++;
+      else if(r.gravedad && r.gravedad.indexOf("Grave") === 0) graves++;
+    });
+    return { leves: leves, graves: graves };
+  }
+  function renderContadores(){
+    var c = contarAccidentes();
+    if($("cnt-leves")) $("cnt-leves").textContent = c.leves;
+    if($("cnt-graves")) $("cnt-graves").textContent = c.graves;
+    if($("acc-stat-leves")) $("acc-stat-leves").textContent = c.leves;
+    if($("acc-stat-graves")) $("acc-stat-graves").textContent = c.graves;
+  }
+
+  /* Vinculación automática del IPERC según el área / puesto elegido */
+  var accIpercArchivo = null;
+  var accIpercSeleccionado = null;
+  function ipercParaArea(lugar){
+    if(!iperc || !lugar) return null;
+    var L = String(lugar).toLowerCase();
+    for(var i = 0; i < iperc.length; i++){
+      var a = String(iperc[i].area || "").toLowerCase();
+      if(a && (a === L || a.indexOf(L) !== -1 || L.indexOf(a) !== -1)) return iperc[i];
+    }
+    return null;
+  }
+  function ipercVinculadoActual(){
+    if(accIpercSeleccionado){
+      for(var i = 0; i < (iperc || []).length; i++){
+        if(iperc[i].id === accIpercSeleccionado) return iperc[i];
+      }
+      accIpercSeleccionado = null;
+    }
+    return ipercParaArea($("a-lugar") ? $("a-lugar").value : "");
+  }
+  /* Búsqueda interna de IPERC: por nombre de trabajo (actividad) o por fecha */
+  function renderBusquedaIperc(){
+    var box = $("a-iperc-results");
+    if(!box) return;
+    var q = ($("a-buscar-texto") ? $("a-buscar-texto").value : "").trim().toLowerCase();
+    var f = $("a-buscar-fecha") ? $("a-buscar-fecha").value : "";
+    var lista = (iperc || []).filter(function(r){
+      var okQ = !q || String(r.actividad || "").toLowerCase().indexOf(q) !== -1 || String(r.area || "").toLowerCase().indexOf(q) !== -1;
+      var okF = !f || r.fecha === f;
+      return okQ && okF;
+    });
+    if(!iperc || !iperc.length){
+      box.innerHTML = '<p class="empty-note">Todavía no hay IPERC registrados para buscar.</p>';
+      return;
+    }
+    if(!lista.length){
+      box.innerHTML = '<p class="empty-note">Ningún IPERC coincide con ese nombre de trabajo o esa fecha. Ajusta los filtros o limpia la búsqueda.</p>';
+      return;
+    }
+    var html = "";
+    lista.forEach(function(r){
+      var sel = accIpercSeleccionado === r.id;
+      html += '<button type="button" class="search-item' + (sel ? ' sel' : '') + '" data-buscar-sel="' + esc(r.id) + '">'
+        + '<strong>' + esc(r.actividad) + (sel ? ' · Seleccionado ✓' : '') + '</strong>'
+        + '<span>' + esc(fechaBonita(r.fecha)) + (r.area ? ' · Área: ' + esc(r.area) : '') + ' · Sede ' + esc(r.sede || "—") + '</span></button>';
+    });
+    box.innerHTML = html;
+    box.querySelectorAll("[data-buscar-sel]").forEach(function(b){
+      b.addEventListener("click", function(){
+        accIpercSeleccionado = (accIpercSeleccionado === b.getAttribute("data-buscar-sel")) ? null : b.getAttribute("data-buscar-sel");
+        var note = $("a-iperc-sel-note");
+        if(note){
+          if(accIpercSeleccionado){
+            var rSel = ipercVinculadoActual();
+            note.innerHTML = "IPERC seleccionado: <strong>" + esc(rSel ? rSel.actividad : "") + "</strong>. Quedará vinculado a este reporte al guardar. Toca de nuevo el resultado para quitar la selección.";
+          } else {
+            note.textContent = "Sin selección manual: se vinculará automáticamente el IPERC del lugar elegido, como hasta ahora.";
+          }
         }
+        renderBusquedaIperc();
+        actualizarVinculoIperc();
+      });
+    });
+  }
+  function actualizarVinculoIperc(){
+    var box = $("a-iperc-box");
+    if(!box || !$("a-lugar")) return;
+    var vinculado = ipercVinculadoActual();
+    if(vinculado){
+      box.className = "link-box ok";
+      box.innerHTML = "<strong>" + (accIpercSeleccionado ? "IPERC seleccionado en el buscador" : "IPERC vinculado automáticamente") + "</strong>"
+        + esc(vinculado.actividad) + " · " + esc(fechaBonita(vinculado.fecha))
+        + (vinculado.area ? " · Área: " + esc(vinculado.area) : "")
+        + "<br />Es el IPERC ya registrado para este puesto/área; quedará asociado a este reporte.";
+    } else {
+      box.className = "link-box falta";
+      box.innerHTML = "<strong>Sin IPERC registrado para esta área</strong>"
+        + "No hay un IPERC en la base para «" + esc($("a-lugar").value) + "». Adjunta el IPERC continuo en digital: es obligatorio para poder guardar el reporte."
+        + '<br /><label class="btn-mini" for="a-iperc-file" style="display:inline-block; margin-top:9px; cursor:pointer;">Adjuntar IPERC continuo</label>'
+        + ' <span class="fname" id="a-iperc-fname">' + (accIpercArchivo ? esc(accIpercArchivo.nombre) : "Ningún archivo seleccionado") + '</span>';
+    }
+  }
+  $("a-lugar").addEventListener("change", actualizarVinculoIperc);
+  if($("btn-buscar-iperc")) $("btn-buscar-iperc").addEventListener("click", renderBusquedaIperc);
+  if($("a-buscar-texto")) $("a-buscar-texto").addEventListener("input", renderBusquedaIperc);
+  if($("a-buscar-fecha")) $("a-buscar-fecha").addEventListener("change", renderBusquedaIperc);
+  if($("btn-limpiar-busqueda")) $("btn-limpiar-busqueda").addEventListener("click", function(){
+    if($("a-buscar-texto")) $("a-buscar-texto").value = "";
+    if($("a-buscar-fecha")) $("a-buscar-fecha").value = "";
+    accIpercSeleccionado = null;
+    var note = $("a-iperc-sel-note");
+    if(note) note.textContent = "Sin selección manual: se vinculará automáticamente el IPERC del lugar elegido, como hasta ahora.";
+    renderBusquedaIperc();
+    actualizarVinculoIperc();
+  });
+  $("a-iperc-file").addEventListener("change", function(){
+    var f = this.files && this.files[0];
+    accIpercArchivo = f ? { nombre: f.name } : null;
+    actualizarVinculoIperc();
+  });
+  function renderAccEquipoOptions(){
+    var sel = $("a-equipo");
+    if(!sel) return;
+    var cur = sel.value || "Ninguno";
+    var html = '<option value="Ninguno">Ninguno</option>';
+    equipos.forEach(function(eq){ html += '<option value="' + esc(eq.nombre) + '">' + esc(eq.nombre) + '</option>'; });
+    html += '<option value="Otro">Otro</option>';
+    sel.innerHTML = html;
+    sel.value = cur;
+  }
+  function renderAccidentes(){
+    renderAccEquipoOptions();
+    renderContadores();
+    var box = $("accidentes-list");
+    if(!box) return;
+    if(!accidentes || !accidentes.length){
+      box.innerHTML = '<p class="empty-note">Todavía no hay accidentes ni incidentes registrados. Cuando ocurra algo, rellena el formato de arriba: si fue accidente, el contador volverá a 0.</p>';
+      return;
+    }
+    var html = "";
+    accidentes.forEach(function(r){
+      var esAccidente = r.tipo && r.tipo.indexOf("Accidente") === 0;
+      html += '<div class="iperc-item"><div class="top"><span><h3>' + esc(r.descripcion) + '</h3>'
+        + '<p class="when">' + esc(fechaBonita(r.fecha)) + (r.hora ? ' · ' + esc(r.hora) : '') + ' · ' + esc(r.lugar || "—") + '</p></span>'
+        + '<span class="pill ' + gravedadPill(r.gravedad) + '">' + esc(r.gravedad || "Leve") + '</span></div>'
+        + '<div class="eval-sum"><div class="eval-sum-pills"><span class="pill ' + (esAccidente ? "fuera" : "mant") + '">' + esc(r.tipo) + '</span>'
+        + (esAccidente ? '<span class="pill fuera">Contador reiniciado a 0</span>' : '<span class="pill op">Sin reinicio del contador</span>') + '</div></div>'
+        + '<div class="item-actions"><button type="button" class="btn-mini" data-acc-detail="' + esc(r.id) + '">Ver detalle</button>'
+        + '<button type="button" class="btn-del" data-acc-del="' + esc(r.id) + '">Eliminar</button></div>'
+        + '<div class="iperc-detail" id="acc-detail-' + esc(r.id) + '">'
+        + '<div class="info-row"><span class="k">Registrado el</span><span class="v">' + esc(r.fechaRegistro || "") + '</span></div>'
+        + '<div class="info-row"><span class="k">Lugar</span><span class="v">' + esc(r.lugar || "—") + '</span></div>'
+        + '<div class="info-row"><span class="k">Equipo</span><span class="v">' + esc(r.equipo || "Ninguno") + '</span></div>'
+        + '<div class="info-row"><span class="k">Persona afectada</span><span class="v">' + esc(r.afectado || "Ninguna") + '</span></div>'
+        + (r.ipercVinculado ? '<div class="info-row"><span class="k">IPERC vinculado</span><span class="v">' + esc(r.ipercVinculado.actividad) + '</span></div>' : '')
+        + (r.ipercArchivo ? '<div class="info-row"><span class="k">IPERC continuo adjunto</span><span class="v">' + esc(r.ipercArchivo) + '</span></div>' : '')
+        + (r.peligro ? '<h4>Peligro relacionado (IPERC)</h4><p>' + esc(r.peligro) + ' — Revisar el IPERC de esta tarea y corregir el control que falló.</p>' : '')
+        + (r.accion ? '<h4>Acción inmediata</h4><p>' + esc(r.accion) + '</p>' : '')
+        + '</div></div>';
+    });
+    box.innerHTML = html;
+    box.querySelectorAll("[data-acc-del]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var id = btn.getAttribute("data-acc-del");
+        accidentes = accidentes.filter(function(r){ return r.id !== id; });
+        saveJSON("cetemin_accidentes_v1", accidentes);
+        renderAccidentes();
+      });
+    });
+    box.querySelectorAll("[data-acc-detail]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var d = document.getElementById("acc-detail-" + btn.getAttribute("data-acc-detail"));
+        if(!d) return;
+        d.classList.toggle("show");
+        btn.textContent = d.classList.contains("show") ? "Ocultar detalle" : "Ver detalle";
+      });
+    });
+  }
 
-        function saveOfflineReport(report) {
-            reportsCache.unshift(report);
-            localStorage.setItem('geoflash_offline_reports', JSON.stringify(reportsCache));
-            renderFeed(reportsCache);
+  if($("a-fecha")) $("a-fecha").value = hoyISO();
+  if($("a-hora")) $("a-hora").value = horaHMS();
+  actualizarVinculoIperc();
+  renderAccEquipoOptions();
+
+  $("accidente-form").addEventListener("submit", function(ev){
+    ev.preventDefault();
+    var descripcion = $("a-descripcion").value.trim();
+    var fecha = $("a-fecha").value;
+    if(!descripcion){ $("accidente-error").textContent = "Describe qué ocurrió en el campo «¿Qué ocurrió?»."; $("accidente-error").classList.add("show"); return; }
+    if(!fecha){ $("accidente-error").textContent = "Elige la fecha en que ocurrió el evento."; $("accidente-error").classList.add("show"); return; }
+    var vinculado = ipercVinculadoActual();
+    if(!vinculado && !accIpercArchivo){
+      $("accidente-error").textContent = "Falta el IPERC: no hay uno registrado para esta área y no adjuntaste el IPERC continuo. Adjunta el archivo en el aviso del formato para poder guardar.";
+      $("accidente-error").classList.add("show");
+      return;
+    }
+    $("accidente-error").classList.remove("show");
+    var tipo = $("a-tipo").value;
+    var esAccidente = tipo.indexOf("Accidente") === 0;
+    accidentes.unshift({
+      id: "ac" + Date.now(),
+      fechaRegistro: ahoraTexto(),
+      fecha: fecha,
+      hora: $("a-hora").value,
+      lugar: $("a-lugar").value,
+      tipo: tipo,
+      gravedad: $("a-gravedad").value,
+      equipo: $("a-equipo").value,
+      afectado: $("a-afectado").value.trim(),
+      descripcion: descripcion,
+      peligro: $("a-peligro").value.trim(),
+      accion: $("a-accion").value.trim(),
+      ipercVinculado: vinculado ? { id: vinculado.id, actividad: vinculado.actividad } : null,
+      ipercArchivo: accIpercArchivo ? accIpercArchivo.nombre : ""
+    });
+    saveJSON("cetemin_accidentes_v1", accidentes);
+    var msg = "Evento registrado. Quedó en el historial de accidentes e incidentes.";
+    if(esAccidente){
+      diasData = { dias: 0, desde: ahoraTexto() };
+      saveJSON("cetemin_dias_v1", diasData);
+      renderDias();
+      msg = "Accidente registrado. El contador de días sin accidentes volvió a 0. Revisa el IPERC de esa tarea y corrige el control que falló.";
+    } else {
+      msg = "Incidente registrado. Como no hubo lesión, el contador de días sin accidentes no se reinicia. Igual sirve para corregir el IPERC.";
+    }
+    $("a-descripcion").value = ""; $("a-afectado").value = ""; $("a-peligro").value = ""; $("a-accion").value = "";
+    $("a-fecha").value = hoyISO(); $("a-hora").value = horaHMS();
+    accIpercArchivo = null; $("a-iperc-file").value = "";
+    accIpercSeleccionado = null;
+    var selNote = $("a-iperc-sel-note");
+    if(selNote) selNote.textContent = "Sin selección manual: se vinculará automáticamente el IPERC del lugar elegido, como hasta ahora.";
+    renderBusquedaIperc();
+    actualizarVinculoIperc();
+    renderAccidentes();
+    var saved = $("accidente-saved");
+    saved.textContent = msg;
+    saved.classList.add("show");
+    setTimeout(function(){ saved.classList.remove("show"); }, 5000);
+  });
+
+  /* ---------- Panel SSOMA ---------- */
+  function ssomaAviso(){
+    var msg = $("ssoma-saved");
+    if(!msg) return;
+    msg.textContent = "Cambios guardados por SSOMA.";
+    msg.classList.add("show");
+    setTimeout(function(){ msg.classList.remove("show"); }, 3500);
+  }
+  function ssomaIpercCard(r, conAcciones){
+    var esSSOMA = session && session.rol === "ssoma";
+    var val = r.validacionSSOMA || "Pendiente";
+    var acc = r.accionCorrectiva || "Pendiente";
+    var controles = (r.evaluaciones || []).map(function(e){ return e.control; }).filter(function(c){ return c; });
+    return '<div class="pedido-card"><div class="top"><span><h3>' + esc(r.actividad) + '</h3>'
+      + '<p class="when">' + esc(fechaBonita(r.fecha)) + (r.area ? ' · ' + esc(r.area) : '') + ' · Registrado: ' + esc(r.fechaRegistro || "") + '</p></span></div>'
+      + '<div class="eval-sum-pills" style="display:flex; gap:7px; flex-wrap:wrap; margin-top:9px;"><span class="pill ' + (val === "Validado" ? "aprobado" : (val === "Observado" ? "renovar" : "pendiente")) + '">IPERC: ' + esc(val) + '</span>'
+      + '<span class="pill ' + (acc === "Verificada" ? "aprobado" : "pendiente") + '">Acción correctiva: ' + esc(acc) + '</span></div>'
+      + (controles.length ? '<p class="det"><strong>Controles a verificar:</strong> ' + esc(controles.join(" · ")) + '</p>' : '<p class="det">Sin medidas de control escritas en el registro.</p>')
+      + (conAcciones && esSSOMA
+        ? '<div class="pedido-actions">'
+          + (val !== "Validado" ? '<button type="button" class="btn-approve" data-ssoma-validar="' + esc(r.id) + '">Validar IPERC</button>' : '')
+          + (val !== "Observado" ? '<button type="button" class="btn-reject" data-ssoma-observar="' + esc(r.id) + '">Observar</button>' : '')
+          + (acc !== "Verificada" ? '<button type="button" class="btn-save-stock" data-ssoma-verificar="' + esc(r.id) + '">Verificar acción correctiva</button>' : '<button type="button" class="btn-mini" data-ssoma-reabrir="' + esc(r.id) + '">Marcar pendiente</button>')
+          + '</div>'
+        : '')
+      + '</div>';
+  }
+  function ipercPendienteSSOMA(r){
+    return (r.validacionSSOMA || "Pendiente") !== "Validado" || (r.accionCorrectiva || "Pendiente") !== "Verificada";
+  }
+
+  /* ---------- Equipos en el Panel SSOMA: inspecciones pendientes e Historial ---------- */
+  function equipoInspControlsHTML(eq){
+    return '<div class="insp-row"><select data-insp-sel="' + esc(eq.id) + '" aria-label="Estado de inspección de ' + esc(eq.nombre) + '">'
+      + '<option value="Operativo"' + (eq.estado === "Operativo" ? " selected" : "") + '>Operativo (inspección aprobada)</option>'
+      + '<option value="En mantenimiento"' + (eq.estado === "En mantenimiento" ? " selected" : "") + '>En mantenimiento</option>'
+      + '<option value="Fuera de servicio"' + (eq.estado === "Fuera de servicio" ? " selected" : "") + '>Fuera de servicio</option></select>'
+      + '<button type="button" class="btn-save-stock" data-insp-save="' + esc(eq.id) + '">Actualizar estado</button></div>';
+  }
+  function ssomaEquipoCard(eq, conControles){
+    var esSSOMA = session && session.rol === "ssoma";
+    var ultimo = (eq.historial && eq.historial.length) ? eq.historial[0] : null;
+    var h = '<div class="pedido-card"><div class="top"><span><h3>' + esc(eq.nombre) + '</h3>'
+      + '<p class="when">' + esc(eq.tipo) + ' · ' + esc(eq.ubicacion) + ' · Últ. mant.: ' + esc(eq.ultimoMant) + '</p></span>'
+      + '<span class="pill ' + estadoClass(eq.estado) + '">' + esc(eq.estado) + '</span></div>';
+    if(ultimo){
+      h += '<p class="det"><strong>Último registro:</strong> ' + esc(ultimo.fecha) + ' · ' + esc(ultimo.estado) + (ultimo.comentario ? ' — ' + esc(ultimo.comentario) : '') + '</p>';
+    }
+    if(conControles && esSSOMA) h += equipoInspControlsHTML(eq);
+    h += '</div>';
+    return h;
+  }
+  function bindInspActions(scope){
+    if(!scope || !session || session.rol !== "ssoma") return;
+    scope.querySelectorAll("[data-insp-save]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var id = b.getAttribute("data-insp-save");
+        var sel = scope.querySelector('[data-insp-sel="' + id + '"]');
+        var eq = getEquipo(id);
+        if(!sel || !eq) return;
+        var nuevo = sel.value;
+        if(eq.estado !== nuevo){
+          eq.estado = nuevo;
+          eq.historial.unshift({ fecha: ahoraTexto(), estado: nuevo, comentario: "Estado de inspección actualizado por SSOMA desde su panel." });
+          saveJSON("cetemin_equipos_v1", equipos);
         }
+        renderEquipos();
+        renderSSOMA();
+        var msg = $("ssoma-saved");
+        if(msg){
+          msg.textContent = nuevo === "Operativo"
+            ? "«" + eq.nombre + "» quedó Operativo: su inspección pasó al Historial."
+            : "Estado de «" + eq.nombre + "» actualizado a «" + nuevo + "».";
+          msg.classList.add("show");
+          setTimeout(function(){ msg.classList.remove("show"); }, 4000);
+        }
+      });
+    });
+  }
 
-        function initCloudSync() {
-            if (!db) return;
-            const reportsCol = collection(db, 'artifacts', appId, 'public', 'data', 'geohazards');
+  /* ---------- Historial SSOMA: todo lo ya resuelto, escondido y con búsqueda ---------- */
+  var histAbierto = false;
+  var histQuery = "", histTipo = "todos", histEstado = "todos";
+  function histItems(){
+    var items = [];
+    pedidos.forEach(function(p){
+      if(p.estado === "Pendiente") return;
+      items.push({
+        tipo: "pedido", estado: p.estado,
+        texto: (p.epp + " " + p.tipo + " " + (p.solicitante || "")).toLowerCase(),
+        html: pedidoCardHTML(p, false)
+      });
+    });
+    (iperc || []).forEach(function(r){
+      if(ipercPendienteSSOMA(r)) return;
+      items.push({
+        tipo: "iperc", estado: "Validado",
+        texto: ((r.actividad || "") + " " + (r.area || "")).toLowerCase(),
+        html: ssomaIpercCard(r, false)
+      });
+    });
+    /* Inspecciones de maquinaria: solo entran al Historial los equipos Operativos. */
+    equipos.forEach(function(eq){
+      if(eq.estado !== "Operativo") return;
+      items.push({
+        tipo: "equipo", estado: "Operativo",
+        texto: ((eq.nombre || "") + " " + (eq.tipo || "") + " " + (eq.ubicacion || "")).toLowerCase(),
+        html: ssomaEquipoCard(eq, true)
+      });
+    });
+    return items;
+  }
+  function renderHistorial(){
+    var list = $("hist-list");
+    if(!list) return;
+    var items = histItems();
+    var count = $("hist-count");
+    if(count) count.textContent = items.length + (items.length === 1 ? " resuelto" : " resueltos") + (histAbierto ? "" : " · Toca para desplegar");
+    if(!items.length){
+      list.innerHTML = '<p class="empty-note">Todavía no hay nada resuelto. Cuando SSOMA apruebe o rechace un pedido, valide un IPERC con su acción correctiva verificada, o una máquina quede operativa, aparecerá aquí.</p>';
+      return;
+    }
+    var q = histQuery.trim().toLowerCase();
+    var vis = items.filter(function(it){
+      if(histTipo !== "todos" && it.tipo !== histTipo) return false;
+      if(histEstado !== "todos" && it.estado !== histEstado) return false;
+      if(q && it.texto.indexOf(q) === -1) return false;
+      return true;
+    });
+    if(!vis.length){
+      list.innerHTML = '<p class="empty-note">Ningún registro coincide con la búsqueda o los filtros. Prueba con otra palabra o limpia los filtros.</p>';
+      return;
+    }
+    list.innerHTML = vis.map(function(it){ return it.html; }).join("");
+    bindInspActions(list);
+  }
+  (function bindHistorial(){
+    var box = $("ssoma-historial"), toggle = $("hist-toggle");
+    if(!box || !toggle) return;
+    toggle.addEventListener("click", function(){
+      histAbierto = !histAbierto;
+      box.classList.toggle("open", histAbierto);
+      toggle.setAttribute("aria-expanded", histAbierto ? "true" : "false");
+      renderHistorial();
+    });
+    var q = $("hist-q");
+    if(q) q.addEventListener("input", function(){ histQuery = q.value; renderHistorial(); });
+    var t = $("hist-tipo");
+    if(t) t.addEventListener("change", function(){ histTipo = t.value; renderHistorial(); });
+    var e = $("hist-estado");
+    if(e) e.addEventListener("change", function(){ histEstado = e.value; renderHistorial(); });
+  })();
 
-            // Escucha en tiempo real optimizada para reflejar cambios instantáneos en todos los equipos
-            onSnapshot(reportsCol, (snapshot) => {
-                let cloudReports = [];
-                snapshot.forEach(docSnap => {
-                    cloudReports.push({ id: docSnap.id, ...docSnap.data() });
-                });
-                
-                // Fusionar con los pendientes locales si los hubiera
-                const pending = reportsCache.filter(r => r.isOfflinePending);
-                const cloudIds = new Set(cloudReports.map(c => c.id));
-                const uniquePending = pending.filter(p => !cloudIds.has(p.id));
-
-                reportsCache = [...uniquePending, ...cloudReports];
-                reportsCache.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-                
-                localStorage.setItem('geoflash_offline_reports', JSON.stringify(reportsCache));
-                renderFeed(reportsCache);
-            }, (error) => {
-                console.warn("Usando caché local por red inestable.");
+  function renderSSOMA(){
+    var esSSOMA = session && session.rol === "ssoma";
+    var lock = $("ssoma-lock-note");
+    if(lock) lock.style.display = esSSOMA ? "none" : "flex";
+    /* Pedidos por aprobar: SOLO los pendientes. Los resueltos pasan al Historial. */
+    var pBox = $("ssoma-pedidos");
+    if(pBox){
+      var pendPed = pedidos.filter(function(p){ return p.estado === "Pendiente"; });
+      if(!pedidos.length){
+        pBox.innerHTML = '<p class="empty-note">No hay solicitudes registradas.</p>';
+      } else if(!pendPed.length){
+        pBox.innerHTML = '<p class="empty-note">No hay solicitudes pendientes. Las aprobadas y rechazadas están en el Historial, al final del panel.</p>';
+      } else {
+        var ph = "";
+        pendPed.forEach(function(p){ ph += pedidoCardHTML(p, true); });
+        pBox.innerHTML = ph;
+        bindPedidoActions(pBox);
+      }
+    }
+    /* Validación IPERC + acciones correctivas: SOLO los pendientes.
+       Un IPERC validado y con su acción correctiva verificada pasa al Historial. */
+    var iBox = $("ssoma-iperc");
+    if(iBox){
+      if(!iperc || !iperc.length){
+        iBox.innerHTML = '<p class="empty-note">Todavía no hay reportes IPERC presentados.</p>';
+      } else {
+        var pendIperc = iperc.filter(ipercPendienteSSOMA);
+        if(!pendIperc.length){
+          iBox.innerHTML = '<p class="empty-note">No hay IPERC pendientes de validación. Los ya validados están en el Historial, al final del panel.</p>';
+        } else {
+          var ih = "";
+          pendIperc.forEach(function(r){ ih += ssomaIpercCard(r, true); });
+          iBox.innerHTML = ih;
+          if(esSSOMA){
+            iBox.querySelectorAll("[data-ssoma-validar]").forEach(function(b){
+              b.addEventListener("click", function(){ setIpercSSOMA(b.getAttribute("data-ssoma-validar"), "validacionSSOMA", "Validado"); });
             });
-        }
-
-        async function syncOfflineReports() {
-            if (!db || !navigator.onLine) return;
-            const pending = reportsCache.filter(r => r.isOfflinePending);
-            if (pending.length === 0) return;
-
-            const reportsCol = collection(db, 'artifacts', appId, 'public', 'data', 'geohazards');
-            for (let r of pending) {
-                try {
-                    await addDoc(reportsCol, {
-                        type: r.type,
-                        location: r.location,
-                        description: r.description,
-                        timeStr: r.timeStr,
-                        timestamp: r.timestamp,
-                        status: 'Sincronizado desde Offline'
-                    });
-                    r.isOfflinePending = false;
-                } catch (e) {
-                    console.error("Fallo al sincronizar:", e);
-                }
-            }
-            localStorage.setItem('geoflash_offline_reports', JSON.stringify(reportsCache));
-        }
-
-        window.setObservation = function(text) {
-            document.getElementById('hazardDesc').value = text;
-        };
-
-        window.submitReport = async function(event) {
-            event.preventDefault();
-            const hazardType = document.getElementById('hazardType').value;
-            const location = document.getElementById('hazardLocation').value.trim();
-            const description = document.getElementById('hazardDesc').value.trim();
-
-            if (!location) return;
-
-            const dateStr = new Date().toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' });
-            const newReport = {
-                id: 'local_' + Date.now(),
-                type: hazardType,
-                location: location,
-                description: description,
-                timeStr: dateStr,
-                timestamp: Date.now(),
-                isOfflinePending: true
-            };
-
-            saveOfflineReport(newReport);
-
-            if (db && navigator.onLine) {
-                try {
-                    const reportsCol = collection(db, 'artifacts', appId, 'public', 'data', 'geohazards');
-                    const docRef = await addDoc(reportsCol, {
-                        type: hazardType,
-                        location: location,
-                        description: description,
-                        timeStr: dateStr,
-                        timestamp: Date.now(),
-                        status: 'Registrado en Nube'
-                    });
-                    // Actualizar ID local con el de la nube para evitar duplicados
-                    newReport.id = docRef.id;
-                    newReport.isOfflinePending = false;
-                    localStorage.setItem('geoflash_offline_reports', JSON.stringify(reportsCache));
-                } catch (e) {
-                    console.warn("Pendiente de sincronización a Firebase.");
-                }
-            }
-
-            const engineerNumber = "51906109349";
-            let message = `🚨 *ALERTA GEOMECÁNICA SUBTERRÁNEA* 🚨\n\n`;
-            message += `⚠️ *Tipo:* ${hazardType}\n`;
-            message += `📍 *Ubicación:* ${location}\n`;
-            if (description) {
-                message += `📝 *Detalles:* ${description}\n`;
-            }
-            message += `⏰ *Hora:* ${dateStr}\n\n`;
-            message += `*(Por favor adjuntar foto de la condición geomecánica)*`;
-
-            const encodedMessage = encodeURIComponent(message);
-            const whatsappUrl = `https://wa.me/${engineerNumber}?text=${encodedMessage}`;
-
-            closeReportModal();
-            window.location.href = whatsappUrl;
-        };
-
-        function renderFeed(reports) {
-            const container = document.getElementById('cloudFeedList');
-            document.getElementById('badgeCount').textContent = reports.length;
-
-            if (reports.length === 0) {
-                container.innerHTML = `<p class="text-zinc-500 italic text-center py-8 text-xs">No hay alertas geomecánicas registradas.</p>`;
-                return;
-            }
-
-            let html = '';
-            reports.forEach(r => {
-                const badgeColor = r.type.includes('Roca') ? 'bg-red-500/20 text-red-300 border-red-500/30' :
-                                   r.type.includes('Deformación') ? 'bg-orange-500/20 text-orange-300 border-orange-500/30' : 'bg-amber-500/20 text-amber-300 border-amber-500/30';
-
-                html += `
-                    <div class="bg-zinc-900 border border-zinc-800/80 rounded-xl p-3 shadow">
-                        <div class="flex items-center justify-between mb-1.5">
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeColor}">${r.type}</span>
-                            <span class="text-[10px] text-zinc-500 font-mono">${r.timeStr || 'Reciente'}</span>
-                        </div>
-                        <div class="text-sm font-bold text-white mb-1 flex items-center gap-1.5">
-                            <i class="fa-solid fa-location-dot text-amber-400 text-xs"></i>
-                            ${r.location}
-                        </div>
-                        ${r.description ? `<p class="text-xs text-zinc-400 mb-2 italic">${r.description}</p>` : ''}
-                        <div class="flex items-center justify-between pt-2 border-t border-zinc-800/60 text-[10px] text-zinc-500">
-                            <span>ID: #${(r.id || '').substring(0, 6)}</span>
-                            <span class="${r.isOfflinePending ? 'text-amber-400' : 'text-emerald-400'} font-semibold flex items-center gap-1">
-                                <i class="fa-solid ${r.isOfflinePending ? 'fa-triangle-exclamation' : 'fa-circle-check'}"></i> 
-                                ${r.isOfflinePending ? 'Guardado Local (Pendiente red)' : 'Alerta enviada'}
-                            </span>
-                        </div>
-                    </div>
-                `;
+            iBox.querySelectorAll("[data-ssoma-observar]").forEach(function(b){
+              b.addEventListener("click", function(){ setIpercSSOMA(b.getAttribute("data-ssoma-observar"), "validacionSSOMA", "Observado"); });
             });
-            container.innerHTML = html;
-        }
-
-        window.switchTab = function(tab) {
-            const btnReport = document.getElementById('tabReport');
-            const btnFeed = document.getElementById('tabFeed');
-            const secReport = document.getElementById('sectionReport');
-            const secFeed = document.getElementById('sectionFeed');
-
-            if (tab === 'report') {
-                btnReport.className = "py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-amber-500 text-zinc-950 transition-all flex items-center justify-center gap-2 shadow";
-                btnFeed.className = "py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-zinc-400 hover:text-white transition-all flex items-center justify-center gap-2";
-                secReport.classList.remove('hidden');
-                secFeed.classList.add('hidden');
-            } else {
-                btnFeed.className = "py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-emerald-500 text-zinc-950 transition-all flex items-center justify-center gap-2 shadow";
-                btnReport.className = "py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-zinc-400 hover:text-white transition-all flex items-center justify-center gap-2";
-                secFeed.classList.remove('hidden');
-                secReport.classList.add('hidden');
-            }
-        };
-
-        window.openReportModal = function(hazardName, colorClass, iconClass) {
-            const modal = document.getElementById('reportModal');
-            const modalContent = document.getElementById('modalContent');
-            const titleEl = document.getElementById('modalTitle');
-            const typeInput = document.getElementById('hazardType');
-            const iconBox = document.getElementById('modalIconBox');
-            const iconEl = document.getElementById('modalIcon');
-            const suggestionsContainer = document.getElementById('dynamicSuggestions');
-
-            titleEl.textContent = hazardName;
-            typeInput.value = hazardName;
-
-            iconBox.className = `w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg ${colorClass}`;
-            iconEl.className = `fa-solid ${iconClass}`;
-
-            document.getElementById('hazardLocation').value = '';
-            document.getElementById('hazardDesc').value = '';
-
-            let suggestionsHTML = '';
-            if (hazardName.includes('Roca')) {
-                suggestionsHTML = `
-                    <button type="button" onclick="setObservation('Bloque de aprox 0.5m3 en techo, requiere acuñadura inmediata.')" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2.5 py-1 rounded-lg border border-zinc-700 transition-colors">⚡ Roca suelta / Planchón</button>
-                    <button type="button" onclick="setObservation('Caja derecha con bloques sueltos y fracturamiento.')" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2.5 py-1 rounded-lg border border-zinc-700 transition-colors">⚡ Bloques en caja derecha</button>
-                    <button type="button" onclick="setObservation('Cuña inestable detectada en frente de labor.')" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2.5 py-1 rounded-lg border border-zinc-700 transition-colors">⚡ Cuña inestable</button>
-                `;
-            } else if (hazardName.includes('Convergencia')) {
-                suggestionsHTML = `
-                    <button type="button" onclick="setObservation('Fisuras y agrietamiento visible en capa de shotcrete.')" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2.5 py-1 rounded-lg border border-zinc-700 transition-colors">⚠️ Fisuras en shotcrete</button>
-                    <button type="button" onclick="setObservation('Deformación y pandeo de cimbras metálicas.')" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2.5 py-1 rounded-lg border border-zinc-700 transition-colors">⚠️ Pandeo de cimbras</button>
-                    <button type="button" onclick="setObservation('Desprendimiento de shotcrete por alta convergencia.')" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2.5 py-1 rounded-lg border border-zinc-700 transition-colors">⚠️ Desprendimiento de shotcrete</button>
-                `;
-            } else {
-                suggestionsHTML = `
-                    <button type="button" onclick="setObservation('Presencia de humedad y goteo constante en corona.')" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2.5 py-1 rounded-lg border border-zinc-700 transition-colors">💧 Goteo constante</button>
-                    <button type="button" onclick="setObservation('Filtración a presión media desde taladro de drenaje.')" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2.5 py-1 rounded-lg border border-zinc-700 transition-colors">💧 Filtración a presión</button>
-                    <button type="button" onclick="setObservation('Acumulación de agua en piso por filtración estructural.')" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2.5 py-1 rounded-lg border border-zinc-700 transition-colors">💧 Acumulación en piso</button>
-                `;
-            }
-            suggestionsContainer.innerHTML = suggestionsHTML;
-
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modalContent.classList.remove('translate-y-full');
-            }, 10);
-
-            setTimeout(() => {
-                document.getElementById('hazardLocation').focus();
-            }, 100);
-        };
-
-        window.closeReportModal = function() {
-            const modal = document.getElementById('reportModal');
-            const modalContent = document.getElementById('modalContent');
-            modal.classList.add('opacity-0');
-            modalContent.classList.add('translate-y-full');
-            setTimeout(() => { modal.classList.add('hidden'); }, 300);
-        };
-
-        window.openRateModal = function() {
-            const modal = document.getElementById('rateModal');
-            const content = document.getElementById('rateModalContent');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                content.classList.remove('scale-95');
-                content.classList.add('scale-100');
-            }, 10);
-        };
-
-        window.closeRateModal = function() {
-            const modal = document.getElementById('rateModal');
-            const content = document.getElementById('rateModalContent');
-            modal.classList.add('opacity-0');
-            content.classList.remove('scale-100');
-            content.classList.add('scale-95');
-            setTimeout(() => { modal.classList.add('hidden'); }, 300);
-        };
-
-        function setupRatingSystem() {
-            const hats = document.querySelectorAll('#hatRatingContainer i');
-            hats.forEach(hat => {
-                hat.addEventListener('click', () => {
-                    selectedRating = parseInt(hat.getAttribute('data-value'));
-                    hats.forEach((h, index) => {
-                        if (index < selectedRating) {
-                            h.classList.remove('text-zinc-600');
-                            h.classList.add('text-amber-400');
-                        } else {
-                            h.classList.remove('text-amber-400');
-                            h.classList.add('text-zinc-600');
-                        }
-                    });
-                });
+            iBox.querySelectorAll("[data-ssoma-verificar]").forEach(function(b){
+              b.addEventListener("click", function(){ setIpercSSOMA(b.getAttribute("data-ssoma-verificar"), "accionCorrectiva", "Verificada"); });
             });
-        }
-
-        window.submitRating = async function() {
-            if (selectedRating === 0) {
-                alertBoxCustom("Selecciona al menos un casquito.");
-                return;
-            }
-
-            if (db && navigator.onLine) {
-                try {
-                    const ratingsCol = collection(db, 'artifacts', appId, 'public', 'data', 'ratings');
-                    await addDoc(ratingsCol, {
-                        rating: selectedRating,
-                        timestamp: Date.now(),
-                        timeStr: new Date().toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' })
-                    });
-                } catch (e) { console.error(e); }
-            }
-
-            alertBoxCustom(`¡Gracias por calificar con ${selectedRating} casquitos!`);
-            closeRateModal();
-            selectedRating = 0;
-            document.querySelectorAll('#hatRatingContainer i').forEach(h => {
-                h.classList.remove('text-amber-400');
-                h.classList.add('text-zinc-600');
+            iBox.querySelectorAll("[data-ssoma-reabrir]").forEach(function(b){
+              b.addEventListener("click", function(){ setIpercSSOMA(b.getAttribute("data-ssoma-reabrir"), "accionCorrectiva", "Pendiente"); });
             });
-        };
-
-        window.shareAppURL = function() {
-            const modal = document.getElementById('shareModal');
-            document.getElementById('shareUrlText').textContent = window.location.href;
-            modal.classList.remove('hidden');
-        };
-
-        window.closeShareModal = function() {
-            document.getElementById('shareModal').classList.add('hidden');
-        };
-
-        window.copyShareUrl = function() {
-            navigator.clipboard.writeText(window.location.href).then(() => {
-                alertBoxCustom("¡Enlace copiado!");
-            });
-            closeShareModal();
-        };
-
-        function alertBoxCustom(msg) {
-            const div = document.createElement('div');
-            div.className = "fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-2xl z-50 animate-bounce";
-            div.textContent = msg;
-            document.body.appendChild(div);
-            setTimeout(() => div.remove(), 2500);
+          }
         }
-    </script>
+      }
+    }
+    /* Inspecciones de maquinaria: SOLO las que aún no están operativas.
+       Cuando un equipo queda Operativo, su inspección pasa al Historial. */
+    var eBox = $("ssoma-equipos");
+    if(eBox){
+      var pendEq = equipos.filter(function(eq){ return eq.estado !== "Operativo"; });
+      if(!pendEq.length){
+        eBox.innerHTML = '<p class="empty-note">Toda la maquinaria está operativa: no quedan inspecciones pendientes. Los equipos operativos están en el Historial, al final del panel.</p>';
+      } else {
+        var eh = "";
+        pendEq.forEach(function(eq){ eh += ssomaEquipoCard(eq, true); });
+        eBox.innerHTML = eh;
+        bindInspActions(eBox);
+      }
+    }
+    renderHistorial();
+  }
+  function setIpercSSOMA(id, campo, valor){
+    for(var i = 0; i < iperc.length; i++){
+      if(iperc[i].id === id){ iperc[i][campo] = valor; break; }
+    }
+    saveJSON("cetemin_iperc_v2", iperc);
+    renderIperc();
+    renderSSOMA();
+    ssomaAviso();
+  }
+
+  /* ---------- Arranque ---------- */
+  if(session && session.email){
+    enterApp();
+  }
+})();
+</script>
 </body>
 </html>
+
