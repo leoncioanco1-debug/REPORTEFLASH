@@ -912,22 +912,6 @@
     .car-track{ transition:none; }
   }
 </style>
-<!-- Scripts de Firebase integrados -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-<script>
-  const firebaseConfig = {
-    apiKey: "TU_API_KEY",
-    authDomain: "TU_AUTH_DOMAIN",
-    projectId: "reporte-fla",
-    storageBucket: "TU_STORAGE_BUCKET",
-    messagingSenderId: "TU_MESSAGING_SENDER_ID",
-    appId: "TU_APP_ID"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-</script>
 </head>
 <body>
 <div class="phone">
@@ -1483,7 +1467,7 @@
       EPP
     </button>
     <button type="button" class="tab" data-go="iperc">
-      <span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg></span>
+      <span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg></span>
       IPERC
     </button>
     <button type="button" class="tab" data-go="accidentes">
@@ -1601,6 +1585,7 @@
   var accidentes = loadJSON("cetemin_accidentes_v1", []);
   var diasData = loadJSON("cetemin_dias_v1", { dias: 10, desde: null });
   var stockData = loadJSON("cetemin_stock_v1", {});
+  var renovadosData = loadJSON("cetemin_renovados_v1", {});
   var PEDIDOS_SEED = [
     { id: "ped-semilla-1", epp: "Guantes", tipo: "Reposición de stock", cantidad: 20, solicitante: "encargado@cetemin.edu.pe", fecha: "21 oct 2026, 09:00", estado: "Pendiente" }
   ];
@@ -1650,6 +1635,9 @@
   var califSeleccionada = null;
 
   function showScreen(name){
+    /* El Panel SSOMA solo le compete al rol SSOMA: si un estudiante o el
+       encargado intentara llegar a esa pantalla, lo devolvemos a Inicio. */
+    if(name === "ssoma" && (!session || session.rol !== "ssoma")) name = "inicio";
     currentScreen = name;
     var ids = { inicio:"screen-inicio", equipos:"screen-equipos", detalle:"screen-detalle", epp:"screen-epp", iperc:"screen-iperc", accidentes:"screen-accidentes", ssoma:"screen-ssoma" };
     Object.keys(ids).forEach(function(k){
@@ -1681,11 +1669,15 @@
     $("user-role").textContent = session.rol === "encargado" ? "Encargado" : (session.rol === "ssoma" ? "SSOMA" : "Estudiante");
     $("user-initial").textContent = (session.email.charAt(0) || "U").toUpperCase();
     $("btn-reset-open").hidden = !(session.rol === "encargado" || session.rol === "ssoma");
-    /* El rol SSOMA entra directo a su chamba: en Inicio solo ve su Panel SSOMA,
-       sin las tarjetas de menú de Equipos, EPP, IPERC y Accidentes. */
+    /* Menú por rol: SSOMA entra directo a su chamba y en Inicio solo ve su
+       Panel SSOMA, sin las tarjetas de Equipos, EPP, IPERC y Accidentes.
+       Y al revés: el Panel SSOMA es solo de SSOMA, así que estudiantes y
+       encargado no ven esa tarjeta en su Inicio. */
     document.querySelectorAll(".menu-btn[data-go]").forEach(function(b){
       var g = b.getAttribute("data-go");
-      b.style.display = (session.rol === "ssoma" && g !== "ssoma") ? "none" : "";
+      var ocultar = (session.rol === "ssoma" && g !== "ssoma")
+                 || (session.rol !== "ssoma" && g === "ssoma");
+      b.style.display = ocultar ? "none" : "";
     });
     /* SSOMA no se pide a sí mismo: su botón del carrusel solo dice «Ver EPP». */
     var eppBtn = $("home-epp-btn");
@@ -1889,6 +1881,15 @@
     var v = stockData[item.nombre];
     return (typeof v === "number") ? v : item.stock;
   }
+  /* El estado visible de un EPP se calcula del stock real, no del dato fijo:
+     sin unidades es «Sin stock» aunque el registro diga otra cosa; con
+     unidades es «Disponible», salvo que siga marcado «Por renovar» y SSOMA
+     aún no haya aprobado su renovación. */
+  function eppEstado(item){
+    if(stockDe(item) <= 0) return "Sin stock";
+    if(item.estado === "Por renovar" && !renovadosData[item.nombre]) return "Por renovar";
+    return "Disponible";
+  }
   function itemsBajoMinimo(){
     return EPP_DATA.filter(function(it){ return stockDe(it) < it.min; });
   }
@@ -1914,13 +1915,15 @@
     EPP_DATA.forEach(function(item, idx){
       var stock = stockDe(item);
       var low = stock < item.min;
+      var estadoVisible = eppEstado(item);
+      var detVisible = item.det + (renovadosData[item.nombre] ? " · Renovado: " + renovadosData[item.nombre] : "");
       var iconSvg = ICONS[item.icon] || ICONS.casco;
       if(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches){
         iconSvg = iconSvg.replace(/#0b2a4a/g, "#ffb800");
       }
       var sugerida = low ? Math.max(1, item.min - stock) : 10;
       html += '<div class="epp-card' + (low ? ' low' : '') + '"><span class="ic" aria-hidden="true">' + iconSvg + '</span>'
-        + '<span class="epp-main"><h3>' + esc(item.nombre) + '</h3><p class="det">' + esc(item.det) + '</p>'
+        + '<span class="epp-main"><h3>' + esc(item.nombre) + '</h3><p class="det">' + esc(detVisible) + '</p>'
         + '<span class="stock-row">'
         + (puedeEditarStock ? '<button type="button" class="btn-stock" data-stock-delta="-1" data-stock-name="' + esc(item.nombre) + '" aria-label="Quitar una unidad de ' + esc(item.nombre) + '">−</button>' : '')
         + '<span class="stock-num">' + stock + ' und.</span>'
@@ -1938,7 +1941,7 @@
         + '<button type="button" class="btn-order" data-order-btn="' + esc(item.nombre) + '">Pedir a SSOMA</button>'
         + '</span><span class="order-hint">El pedido llega a SSOMA como Pendiente; SSOMA lo aprueba desde su panel.</span></span>')
         + '</span>'
-        + '<span class="pill ' + (low ? 'fuera' : eppClass(item.estado)) + '">' + (low ? 'Stock bajo' : esc(item.estado)) + '</span></div>';
+        + '<span class="pill ' + (low ? 'fuera' : eppClass(estadoVisible)) + '">' + (low ? 'Stock bajo' : esc(estadoVisible)) + '</span></div>';
     });
     $("epp-list").innerHTML = html;
     $("epp-list").querySelectorAll("[data-stock-delta]").forEach(function(b){
@@ -2014,6 +2017,9 @@
     if(p.estado === "Aprobado" && p.tipo === "Reposición de stock"){
       h += '<p class="det">Stock actualizado: se sumaron ' + p.cantidad + ' und. a «' + esc(p.epp) + '» al aprobarse.</p>';
     }
+    if(p.estado === "Aprobado" && p.tipo === "Renovación de EPP"){
+      h += '<p class="det">Renovación registrada: «' + esc(p.epp) + '» quedó como Disponible al aprobarse.</p>';
+    }
     if(p.estado !== "Pendiente" && p.fechaResolucion){
       h += '<p class="det"><strong>Resuelto:</strong> ' + esc(p.fechaResolucion) + (p.resueltoPor ? ' · por ' + esc(p.resueltoPor) : '') + '</p>';
     }
@@ -2044,6 +2050,12 @@
         saveJSON("cetemin_stock_v1", stockData);
       }
     }
+    if(aprobar && p.tipo === "Renovación de EPP"){
+      /* Al aprobarse la renovación, el EPP deja de figurar «Por renovar»:
+         queda registrado como renovado y su estado pasa a «Disponible». */
+      renovadosData[p.epp] = ahoraTexto();
+      saveJSON("cetemin_renovados_v1", renovadosData);
+    }
     saveJSON("cetemin_pedidos_v1", pedidos);
     renderEPP();
     renderPedidos();
@@ -2051,7 +2063,7 @@
     var msg = $("ssoma-saved");
     if(msg && currentScreen === "ssoma"){
       msg.textContent = aprobar
-        ? "Solicitud aprobada («Aprobado») y movida al Historial." + (p.tipo === "Reposición de stock" ? " El stock de " + p.epp + " se actualizó." : "")
+        ? "Solicitud aprobada («Aprobado») y movida al Historial." + (p.tipo === "Reposición de stock" ? " El stock de " + p.epp + " se actualizó." : "") + (p.tipo === "Renovación de EPP" ? " «" + p.epp + "» quedó como Disponible (renovado)." : "")
         : "Solicitud rechazada y movida al Historial.";
       msg.classList.add("show");
       setTimeout(function(){ msg.classList.remove("show"); }, 4000);
@@ -2996,3 +3008,4 @@
 </script>
 </body>
 </html>
+
