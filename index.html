@@ -445,6 +445,10 @@
     border-radius:8px; padding:10px 12px; font-weight:700; font-size:.9rem; margin-top:12px;
   }
   .saved-msg.show{ display:block; }
+  .role-note{
+    background:var(--surface-2); border:1px solid var(--line); border-radius:8px;
+    padding:10px 12px; font-size:.88rem; font-weight:500; color:var(--muted); margin-top:10px;
+  }
 
   /* ---------- EPP ---------- */
   .epp-card{
@@ -1121,6 +1125,7 @@
               <option value="En mantenimiento">En mantenimiento</option>
               <option value="Fuera de servicio">Fuera de servicio</option>
             </select>
+            <p class="role-note" id="rep-nota-estudiante" hidden>Como estudiante, solo puedes reportar un equipo como <strong>Fuera de servicio</strong> si detectas una falla o condición insegura. Marcarlo Operativo o En mantenimiento es decisión del Encargado y de SSOMA.</p>
           </div>
           <div class="field">
             <label for="rep-comentario">Comentario</label>
@@ -1178,6 +1183,8 @@
                   <label for="f-sede">Sede</label>
                   <select id="f-sede">
                     <option value="ABQ">ABQ</option>
+                    <option value="IRQ">IRQ</option>
+                    <option value="FCHB">FCHB</option>
                     <option value="Otra">Otra</option>
                   </select>
                 </div>
@@ -1994,7 +2001,18 @@
     $("det-ubicacion").textContent = eq.ubicacion;
     $("det-estado").textContent = eq.estado;
     $("det-mant").textContent = eq.ultimoMant;
-    $("rep-estado").value = eq.estado;
+    /* Estados por rol: el estudiante solo puede reportar «Fuera de servicio»
+       (detectó una falla); declarar un equipo Operativo o En mantenimiento
+       es decisión del Encargado o de SSOMA. */
+    var esEstudiante = session && session.rol === "estudiante";
+    var sel = $("rep-estado");
+    sel.innerHTML = esEstudiante
+      ? '<option value="Fuera de servicio">Fuera de servicio</option>'
+      : '<option value="Operativo">Operativo</option>'
+      + '<option value="En mantenimiento">En mantenimiento</option>'
+      + '<option value="Fuera de servicio">Fuera de servicio</option>';
+    $("rep-nota-estudiante").hidden = !esEstudiante;
+    sel.value = esEstudiante ? "Fuera de servicio" : eq.estado;
     $("rep-comentario").value = "";
     $("report-saved").classList.remove("show");
     var html = "";
@@ -2017,6 +2035,8 @@
     var eq = getEquipo(currentEquipoId);
     if(!eq) return;
     var nuevo = $("rep-estado").value;
+    /* Red de seguridad: un estudiante jamás marca Operativo ni En mantenimiento. */
+    if(session && session.rol === "estudiante") nuevo = "Fuera de servicio";
     var comentario = $("rep-comentario").value.trim();
     eq.estado = nuevo;
     eq.historial.unshift({ fecha: ahoraTexto(), estado: nuevo, comentario: comentario || "Actualización de estado sin comentario." });
@@ -3173,4 +3193,5 @@
 </script>
 </body>
 </html>
+
 
