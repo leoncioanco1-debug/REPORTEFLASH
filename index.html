@@ -941,6 +941,8 @@
   .hist-filter-row{ display:grid; grid-template-columns:1fr 1fr; gap:9px; }
   #hist-list{ display:grid; gap:10px; }
   #hist-list .pedido-card{ margin-bottom:0; }
+  #epp-hist-list{ display:grid; gap:10px; }
+  #epp-hist-list .pedido-card{ margin-bottom:0; }
   @media (prefers-reduced-motion: reduce){ .hist-toggle .hist-chev{ transition:none; } }
 
   @media (prefers-reduced-motion: reduce){
@@ -1187,9 +1189,20 @@
         <div id="epp-list"></div>
 
         <h3 class="section-h">Pedidos y renovaciones a SSOMA</h3>
-        <p class="page-sub" style="margin-bottom:12px;">Cada pedido que envías desde una tarjeta de EPP llega aquí como <strong>Pendiente</strong>. Solo el rol <strong>SSOMA</strong> puede aprobarlo: al aprobar, el estado pasa a <strong>Aprobado</strong> y, si es reposición, el stock se suma automáticamente.</p>
+        <p class="page-sub" style="margin-bottom:12px;">Cada pedido que envías desde una tarjeta de EPP llega aquí como <strong>Pendiente</strong> y se queda en esta lista hasta que SSOMA lo resuelva. Solo el rol <strong>SSOMA</strong> puede aprobarlo: al aprobar, el estado pasa a <strong>Aprobado</strong> y, si es reposición, el stock se suma automáticamente. Cuando un pedido tuyo es aprobado o rechazado, sale de esta lista y pasa a <strong>tu Historial</strong>, aquí abajo.</p>
         <div id="pedidos-list"></div>
         <p class="saved-msg" id="pedido-saved">Pedido enviado a SSOMA. Quedó en estado Pendiente.</p>
+
+        <h3 class="section-h">Historial</h3>
+        <div class="hist-box" id="epp-historial">
+          <button type="button" class="hist-toggle" id="epp-hist-toggle" aria-expanded="false" aria-controls="epp-hist-body">
+            <span><strong>Historial de mis pedidos</strong><small id="epp-hist-count">0 resueltos · Toca para desplegar</small></span>
+            <svg class="hist-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="hist-body" id="epp-hist-body">
+            <div id="epp-hist-list"></div>
+          </div>
+        </div>
 
         <div class="steps-card">
           <h3>¿Cómo renuevo mi EPP?</h3>
@@ -2361,18 +2374,60 @@
       setTimeout(function(){ msg.classList.remove("show"); }, 4000);
     }
   }
+  /* Pedidos propios: en la pantalla EPP cada estudiante o encargado ve solo
+     los pedidos que él envió. Los Pendientes se quedan en la lista principal
+     hasta que SSOMA los apruebe o rechace; los resueltos pasan a su
+     Historial personal, para que la lista no crezca sin fin. */
+  function esPedidoMio(p){
+    if(!session || !session.email) return true;
+    return (p.solicitante || "") === session.email;
+  }
   function renderPedidos(){
     var box = $("pedidos-list");
     if(!box) return;
-    if(!pedidos.length){
-      box.innerHTML = '<p class="empty-note">Todavía no hay pedidos. Usa el botón «Pedir a SSOMA» en cualquier tarjeta de EPP para crear el primero.</p>';
+    var mios = pedidos.filter(esPedidoMio);
+    var pend = mios.filter(function(p){ return p.estado === "Pendiente"; });
+    if(!mios.length){
+      box.innerHTML = '<p class="empty-note">Todavía no has enviado pedidos. Usa el botón «Pedir a SSOMA» en cualquier tarjeta de EPP para crear el primero.</p>';
+    } else if(!pend.length){
+      box.innerHTML = '<p class="empty-note">No tienes pedidos pendientes. Los que SSOMA ya aprobó o rechazó están en tu Historial, aquí abajo.</p>';
+    } else {
+      var html = "";
+      pend.forEach(function(p){ html += pedidoCardHTML(p, true); });
+      box.innerHTML = html;
+      bindPedidoActions(box);
+    }
+    renderEppHistorial();
+  }
+  var eppHistAbierto = false;
+  function renderEppHistorial(){
+    var list = $("epp-hist-list");
+    if(!list) return;
+    var resueltos = pedidos.filter(function(p){ return esPedidoMio(p) && p.estado !== "Pendiente"; });
+    var count = $("epp-hist-count");
+    if(count){
+      var ap = resueltos.filter(function(p){ return p.estado === "Aprobado"; }).length;
+      var re = resueltos.length - ap;
+      count.textContent = resueltos.length + (resueltos.length === 1 ? " resuelto" : " resueltos")
+        + (resueltos.length ? " (" + ap + " aprobado" + (ap === 1 ? "" : "s") + " · " + re + " rechazado" + (re === 1 ? "" : "s") + ")" : "")
+        + (eppHistAbierto ? "" : " · Toca para desplegar");
+    }
+    if(!resueltos.length){
+      list.innerHTML = '<p class="empty-note">Todavía no tienes pedidos resueltos. Cuando SSOMA apruebe o rechace uno de tus pedidos, aparecerá aquí.</p>';
       return;
     }
-    var html = "";
-    pedidos.forEach(function(p){ html += pedidoCardHTML(p, true); });
-    box.innerHTML = html;
-    bindPedidoActions(box);
+    list.innerHTML = resueltos.map(function(p){ return pedidoCardHTML(p, false); }).join("");
   }
+  (function bindEppHistorial(){
+    var box = $("epp-historial"), toggle = $("epp-hist-toggle");
+    if(!box || !toggle) return;
+    toggle.addEventListener("click", function(){
+      eppHistAbierto = !eppHistAbierto;
+      box.classList.toggle("open", eppHistAbierto);
+      toggle.setAttribute("aria-expanded", eppHistAbierto ? "true" : "false");
+      renderEppHistorial();
+    });
+  })();
 
   /* ---------- Tarjetas Equipos / EPP del carrusel superior ---------- */
   function renderHomeCards(){
