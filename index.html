@@ -689,9 +689,9 @@
   }
   .adj-zone strong{ display:block; font-size:.98rem; margin-bottom:4px; }
   .adj-zone span{ color:var(--muted); font-size:.87rem; font-weight:500; }
-  #adj-preview{ margin-top:12px; }
-  #adj-preview:empty{ margin-top:0; }
-  #adj-preview img{ width:100%; border-radius:10px; display:block; margin-bottom:8px; }
+  #adj-preview, #acc-adj-preview{ margin-top:12px; }
+  #adj-preview:empty, #acc-adj-preview:empty{ margin-top:0; }
+  #adj-preview img, #acc-adj-preview img{ width:100%; border-radius:10px; display:block; margin-bottom:8px; }
   .eval-sum{ margin-top:11px; padding-top:11px; border-top:1px solid var(--line); }
   .eval-sum-p{ font-weight:600; font-size:.93rem; }
   .eval-sum-pills{ display:flex; align-items:center; gap:7px; margin-top:7px; flex-wrap:wrap; }
@@ -1480,6 +1480,18 @@
                 <label for="a-accion">Acción inmediata que se tomó</label>
                 <textarea id="a-accion" placeholder="Ej.: Se detuvo la tarea, se brindó primeros auxilios y se avisó a SSOMA y al encargado"></textarea>
               </div>
+            </div>
+          </div>
+
+          <div class="fsec">
+            <h3>Archivos adjuntos</h3>
+            <div class="fsec-body">
+              <label class="adj-zone" for="acc-adj-input">
+                <strong>Sube una imagen de evidencia</strong>
+                <span>Imagen que evidencie el accidente o incidente ocurrido. Toca aquí para seleccionarla.</span>
+              </label>
+              <input type="file" id="acc-adj-input" accept="image/*" hidden />
+              <div id="acc-adj-preview"></div>
             </div>
           </div>
 
@@ -3009,6 +3021,48 @@
   /* Vinculación automática del IPERC según el área / puesto elegido */
   var accIpercArchivo = null;
   var accIpercSeleccionado = null;
+  /* Adjunto opcional del reporte: imagen de evidencia del accidente o
+     incidente. Mismo mecanismo que el adjunto del IPERC continuo: se
+     comprime a JPEG (máx. 900 px, calidad 0.82) y se guarda como dataURL
+     junto al registro en la base compartida (cetemin_accidentes_v1). */
+  var accAdjunto = null;
+  function renderAccAdjunto(){
+    var box = $("acc-adj-preview");
+    if(!box) return;
+    if(accAdjunto){
+      box.innerHTML = '<img src="' + accAdjunto + '" alt="Imagen de evidencia adjunta" /><button type="button" class="btn-mini-del" id="acc-adj-remove">Quitar imagen</button>';
+      $("acc-adj-remove").addEventListener("click", function(){
+        accAdjunto = null;
+        $("acc-adj-input").value = "";
+        renderAccAdjunto();
+      });
+    } else {
+      box.innerHTML = "";
+    }
+  }
+  $("acc-adj-input").addEventListener("change", function(){
+    var file = this.files && this.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      var img = new Image();
+      img.onload = function(){
+        try{
+          var max = 900;
+          var scale = Math.min(1, max / Math.max(img.width, img.height));
+          var canvas = document.createElement("canvas");
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+          canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+          accAdjunto = canvas.toDataURL("image/jpeg", 0.82);
+        }catch(e){ accAdjunto = reader.result; }
+        renderAccAdjunto();
+      };
+      img.onerror = function(){ accAdjunto = reader.result; renderAccAdjunto(); };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
   function ipercParaArea(lugar){
     if(!iperc || !lugar) return null;
     var L = String(lugar).toLowerCase();
@@ -3133,7 +3187,8 @@
         + '<p class="when">' + esc(fechaBonita(r.fecha)) + (r.hora ? ' · ' + esc(r.hora) : '') + ' · ' + esc(r.lugar || "—") + '</p></span>'
         + '<span class="pill ' + gravedadPill(r.gravedad) + '">' + esc(r.gravedad || "Leve") + '</span></div>'
         + '<div class="eval-sum"><div class="eval-sum-pills"><span class="pill ' + (esAccidente ? "fuera" : "mant") + '">' + esc(r.tipo) + '</span>'
-        + (esAccidente ? '<span class="pill fuera">Contador reiniciado a 0</span>' : '<span class="pill op">Sin reinicio del contador</span>') + '</div></div>'
+        + (esAccidente ? '<span class="pill fuera">Contador reiniciado a 0</span>' : '<span class="pill op">Sin reinicio del contador</span>')
+        + (r.adjunto ? '<span class="pill op">Con evidencia</span>' : '') + '</div></div>'
         + '<div class="item-actions"><button type="button" class="btn-mini" data-acc-detail="' + esc(r.id) + '">Ver detalle</button>'
         + '<button type="button" class="btn-del" data-acc-del="' + esc(r.id) + '">Eliminar</button></div>'
         + '<div class="iperc-detail" id="acc-detail-' + esc(r.id) + '">'
@@ -3145,6 +3200,7 @@
         + (r.ipercArchivo ? '<div class="info-row"><span class="k">IPERC continuo adjunto</span><span class="v">' + esc(r.ipercArchivo) + '</span></div>' : '')
         + (r.peligro ? '<h4>Peligro relacionado (IPERC)</h4><p>' + esc(r.peligro) + ' — Revisar el IPERC de esta tarea y corregir el control que falló.</p>' : '')
         + (r.accion ? '<h4>Acción inmediata</h4><p>' + esc(r.accion) + '</p>' : '')
+        + (r.adjunto ? '<h4>Archivo adjunto</h4><img src="' + r.adjunto + '" alt="Imagen de evidencia del accidente o incidente" />' : '')
         + '</div></div>';
     });
     box.innerHTML = html;
@@ -3200,7 +3256,8 @@
       peligro: $("a-peligro").value.trim(),
       accion: $("a-accion").value.trim(),
       ipercVinculado: vinculado ? { id: vinculado.id, actividad: vinculado.actividad } : null,
-      ipercArchivo: accIpercArchivo ? accIpercArchivo.nombre : ""
+      ipercArchivo: accIpercArchivo ? accIpercArchivo.nombre : "",
+      adjunto: accAdjunto
     });
     saveJSON("cetemin_accidentes_v1", accidentes);
     var msg = "Evento registrado. Quedó en el historial de accidentes e incidentes.";
@@ -3215,6 +3272,8 @@
     $("a-descripcion").value = ""; $("a-afectado").value = ""; $("a-peligro").value = ""; $("a-accion").value = "";
     $("a-fecha").value = hoyISO(); $("a-hora").value = horaHMS();
     accIpercArchivo = null; $("a-iperc-file").value = "";
+    accAdjunto = null; $("acc-adj-input").value = "";
+    renderAccAdjunto();
     accIpercSeleccionado = null;
     var selNote = $("a-iperc-sel-note");
     if(selNote) selNote.textContent = "Sin selección manual: se vinculará automáticamente el IPERC del lugar elegido, como hasta ahora.";
@@ -3540,3 +3599,4 @@
 </script>
 </body>
 </html>
+
