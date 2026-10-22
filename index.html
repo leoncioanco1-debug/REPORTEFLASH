@@ -200,6 +200,47 @@
     font-size:.92rem; color:var(--muted); font-weight:600; letter-spacing:.05em;
   }
 
+  /* ---------- Tutoriales (botón en el login + ventana flotante) ---------- */
+  .login-hero-top{
+    display:flex; justify-content:space-between; align-items:flex-start; gap:12px;
+    margin-bottom:18px;
+  }
+  .login-hero-top .mark{ margin-bottom:0; }
+  .btn-tutoriales{
+    background:rgba(255,255,255,.08); color:#eaf1f7;
+    border:1.5px solid rgba(255,255,255,.35);
+    border-radius:999px; padding:7px 13px;
+    font-size:.82rem; font-weight:700; letter-spacing:.04em;
+    display:inline-flex; align-items:center; gap:6px; flex:none;
+  }
+  .btn-tutoriales .play{ color:var(--yellow); font-size:.68rem; line-height:1; }
+  .btn-tutoriales:active{ background:rgba(255,255,255,.18); }
+  .tut-list{ display:grid; gap:10px; margin-top:14px; }
+  .tut-opt{
+    width:100%; text-align:left;
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    background:var(--surface-2); border:1px solid var(--line); border-radius:10px;
+    padding:13px 14px; color:var(--text);
+  }
+  .tut-opt:active{ transform:scale(.99); }
+  .tut-opt .who{ font-weight:700; font-size:.98rem; }
+  .tut-opt .hint{ display:block; font-size:.84rem; color:var(--muted); font-weight:500; margin-top:2px; }
+  .tut-opt .play-ic{
+    width:34px; height:34px; border-radius:50%; flex:none;
+    background:var(--yellow); color:#1a1400;
+    display:flex; align-items:center; justify-content:center; font-size:.78rem; padding-left:2px;
+  }
+  .tut-video-wrap{ display:none; }
+  .tut-video-wrap.show{ display:block; }
+  .tut-player{
+    background:#000; border-radius:12px; overflow:hidden;
+    aspect-ratio:9/16; max-height:70vh;
+    width:min(100%, calc(70vh * 9 / 16));
+    margin:14px auto 0;
+  }
+  .tut-player iframe{ width:100%; height:100%; border:0; display:block; }
+  .tut-back{ margin:14px 0 0; }
+
   /* ---------- Encabezado de app ---------- */
   .appbar{
     background:var(--navy);
@@ -957,8 +998,11 @@
   <!-- ============ PANTALLA 1 · LOGIN ============ -->
   <section class="screen active" id="screen-login">
     <div class="login-hero">
-      <div class="mark" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#0b2a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1v-2a1 1 0 0 0-.6-.92l-4.07-1.63a2 2 0 0 1-1.11-1.11L15 6H9L7.78 12.34a2 2 0 0 1-1.11 1.11L2.6 15.08A1 1 0 0 0 2 16Z"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><circle cx="7" cy="21" r="1.6" fill="#0b2a4a" stroke="none"/><circle cx="17" cy="21" r="1.6" fill="#0b2a4a" stroke="none"/></svg>
+      <div class="login-hero-top">
+        <div class="mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0b2a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1v-2a1 1 0 0 0-.6-.92l-4.07-1.63a2 2 0 0 1-1.11-1.11L15 6H9L7.78 12.34a2 2 0 0 1-1.11 1.11L2.6 15.08A1 1 0 0 0 2 16Z"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><circle cx="7" cy="21" r="1.6" fill="#0b2a4a" stroke="none"/><circle cx="17" cy="21" r="1.6" fill="#0b2a4a" stroke="none"/></svg>
+        </div>
+        <button type="button" class="btn-tutoriales" id="btn-tutoriales"><span class="play" aria-hidden="true">▶</span> Tutoriales</button>
       </div>
       <h1>Equipos y<br /><span>Seguridad</span></h1>
       <p class="sub">CETEMIN · EXPLORACIÓN Y OPERACIÓN MINERA</p>
@@ -1561,6 +1605,40 @@
           <span>Este riesgo puede ser tolerable.</span>
           <span class="legend-plazo">Plazo de medida correctiva: 1 MES</span>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal · Tutoriales (videos de YouTube por rol, sin salir de la página) -->
+  <div class="modal-overlay" id="tut-modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="tut-title">
+      <div class="modal-head">
+        <h3 id="tut-title">Tutoriales</h3>
+        <button type="button" class="modal-close" id="tut-close" aria-label="Cerrar tutoriales">&times;</button>
+      </div>
+      <div id="tut-list-view">
+        <p class="modal-hint">Elige tu rol y mira el video aquí mismo, sin salir de la página.</p>
+        <div class="tut-list">
+          <button type="button" class="tut-opt" data-video="b2QfSjyjcK0" data-rol="Estudiante">
+            <span><span class="who">Estudiante</span><span class="hint">Ver tutorial del rol Estudiante</span></span>
+            <span class="play-ic" aria-hidden="true">▶</span>
+          </button>
+          <button type="button" class="tut-opt" data-video="CrvYeNA1pig" data-rol="Encargado">
+            <span><span class="who">Encargado</span><span class="hint">Ver tutorial del rol Encargado</span></span>
+            <span class="play-ic" aria-hidden="true">▶</span>
+          </button>
+          <button type="button" class="tut-opt" data-video="MJv5fzWaN6w" data-rol="SSOMA">
+            <span><span class="who">SSOMA</span><span class="hint">Ver tutorial del rol SSOMA</span></span>
+            <span class="play-ic" aria-hidden="true">▶</span>
+          </button>
+        </div>
+      </div>
+      <div class="tut-video-wrap" id="tut-video-view">
+        <p class="modal-sub" id="tut-video-title">Tutorial</p>
+        <div class="tut-player">
+          <iframe id="tut-frame" title="Video tutorial de YouTube" allow="accelerometer; autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        </div>
+        <button type="button" class="btn-back tut-back" id="tut-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg> Volver</button>
       </div>
     </div>
   </div>
@@ -2681,6 +2759,36 @@
   $("matriz-close").addEventListener("click", closeMatriz);
   $("matriz-modal").addEventListener("click", function(ev){ if(ev.target === this) closeMatriz(); });
 
+  /* ---------- Tutoriales (botón del login + videos de YouTube) ---------- */
+  function tutShowList(){
+    $("tut-frame").src = "";
+    $("tut-video-view").classList.remove("show");
+    $("tut-list-view").style.display = "";
+  }
+  function openTut(){
+    tutShowList();
+    $("tut-modal").hidden = false;
+    document.body.style.overflow = "hidden";
+  }
+  function closeTut(){
+    $("tut-modal").hidden = true;
+    $("tut-frame").src = "";
+    document.body.style.overflow = "";
+  }
+  $("btn-tutoriales").addEventListener("click", openTut);
+  $("tut-close").addEventListener("click", closeTut);
+  $("tut-modal").addEventListener("click", function(ev){ if(ev.target === this) closeTut(); });
+  $("tut-back").addEventListener("click", tutShowList);
+  document.querySelectorAll(".tut-opt").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var id = btn.getAttribute("data-video");
+      $("tut-video-title").textContent = "Tutorial · " + btn.getAttribute("data-rol");
+      $("tut-frame").src = "https://www.youtube-nocookie.com/embed/" + id + "?rel=0&autoplay=1";
+      $("tut-list-view").style.display = "none";
+      $("tut-video-view").classList.add("show");
+    });
+  });
+
   /* ---------- Adjunto (imagen de evidencia) ---------- */
   function renderAdjunto(){
     var box = $("adj-preview");
@@ -3432,4 +3540,3 @@
 </script>
 </body>
 </html>
-
