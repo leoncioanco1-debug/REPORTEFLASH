@@ -1372,7 +1372,7 @@
 
         <div class="explain-card">
           <h3>¿Cómo se sabe si hubo un accidente?</h3>
-          <p>No se sabe solo: <strong>alguien lo reporta</strong>. La persona afectada, un compañero que lo vio o el encargado avisa a SSOMA y rellena este formato el mismo día. Sin reporte, el contador sigue subiendo aunque haya pasado algo.</p>
+          <p>No se sabe automáticamente: <strong>alguien tiene que reportarlo</strong>. La persona afectada, un compañero que lo vio o el encargado avisa a SSOMA y completa este formato el mismo día. Sin ese reporte, el accidente no queda registrado y el contador sigue subiendo como si nada hubiera pasado.</p>
           <div class="diff-box">
             <span class="tag antes">Antes · IPERC</span>
             <p><strong>El IPERC es preventivo.</strong> Se llena <em>antes</em> de la tarea para identificar peligros y poner controles. No registra accidentes y no reinicia el contador.</p>
@@ -2363,6 +2363,10 @@
         var inp = $("epp-list").querySelector('[data-order-cant="' + name.replace(/"/g, '\\"') + '"]');
         var cant = inp ? parseInt(inp.value, 10) : 0;
         if(isNaN(cant) || cant < 1) cant = 1;
+        var tipoPedido = sel ? sel.value : "Reposición de stock";
+        if(!window.confirm("¿Enviar este pedido a SSOMA?\n\nEPP: " + name + "\nTipo: " + tipoPedido + "\nCantidad: " + cant + " und.\n\nEl pedido quedará en estado Pendiente hasta que SSOMA lo apruebe o lo rechace.")){
+          return;
+        }
         pedidos.unshift({
           id: "ped" + Date.now(),
           epp: name,
@@ -3242,6 +3246,9 @@
     $("accidente-error").classList.remove("show");
     var tipo = $("a-tipo").value;
     var esAccidente = tipo.indexOf("Accidente") === 0;
+    if(esAccidente && !window.confirm("Estás registrando un ACCIDENTE.\n\nAl guardar, el contador de días sin accidentes volverá a 0 para todo el taller y la mina escuela.\n\n¿Confirmas que el accidente ocurrió y quieres registrarlo?")){
+      return;
+    }
     accidentes.unshift({
       id: "ac" + Date.now(),
       fechaRegistro: ahoraTexto(),
@@ -3599,4 +3606,3 @@
 </script>
 </body>
 </html>
-
